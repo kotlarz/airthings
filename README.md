@@ -1,6 +1,9 @@
 # airthings
 
-`airthings` is a simple python package that contains methods to communicate with [Airthings](https://airthings.com/) devices. The package utilizies [bluepy](https://github.com/IanHarvey/bluepy) for the communication between python and the devices. The package features can be found below.
+`airthings` is a simple python package that contains methods to communicate with Airthings[1] devices. The package utilizies bluepy[2] for the communication between python and the devices. The package features can be found below.
+
+- [1] https://airthings.com/
+- [2] https://github.com/IanHarvey/bluepy
 
 _Note: Some features are currently undocumented, and parts are untested/not yet implemented._
 
@@ -18,17 +21,6 @@ The package has currently only been tested on Linux with the `Wave Plus Gen 1 (2
 
 - libglib2.0-dev
 
-## Supported devices
-
-| Model number\* | Device label    | Sensor capabilites                                                                                                                                                                                                | Notes                                                                                                                                                    |
-| -------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2900           | Wave Gen 1      | <ul><li>Humidity (%rH)</li><li>Radon short term average (Bp/m3)</li><li>Radon long term average (Bq/m3)</li><li>Temperature (°C)</li></ul>                                                                        | On 1st Gen Wave, temperature and humidity are updated every time we read the wave.                                                                       |
-| 2920           | Wave Mini Gen 1 | <ul><li>Humidity (%rH)</li><li>Temperature (°C)</li><li>Atmospheric pressure (hPa)</li><li>VOC (ppb)</li></ul>                                                                                                    | Sensor values are updated every 5 minutes.                                                                                                               |
-| 2930           | Wave Plus Gen 1 | <ul><li>Humidity (%rH)</li><li>Radon short term average (Bp/m3)</li><li>Radon long term average (Bq/m3)</li><li>Temperature (°C)</li><li>Atmospheric pressure (hPa)</li><li>CO2 (ppm)</li><li>VOC (ppb)</li></ul> | Except for the radon measurements, the Wave Plus updates its current sensor values once every 5 minutes. Radon measurements are updated once every hour. |
-| 2940           | Wave Gen 2      | <ul><li>Humidity (%rH)</li><li>Radon short term average (Bp/m3)</li><li>Radon long term average (Bq/m3)</li><li>Temperature (°C)</li></ul>                                                                        | On 2nd Gen Wave, temperature and humidity are updated every 5 minutes. On both devices, radon measurements are updated once every hour.                  |
-
-_\* Model number is the first 4 digits of the Airthings device_
-
 ## Installation
 
 The current stable version of infrastructure-daigrams is available on pypi and can be installed by running:
@@ -43,3 +35,54 @@ Other sources:
 ## Usage
 
 Examples can be found in the [examples](./examples) directory.
+
+## Supported devices
+
+_Note: "Model number" are the first 4 digits of the Airthings device_
+
+### Wave Gen 1 (Model number: 2900)
+
+On 1st Gen Wave, temperature and humidity are updated every time we read the wave.
+
+#### Sensor capabilities
+
+- Humidity (%rH)
+- Radon short term average (Bp/m3)
+- Radon long term average (Bq/m3)
+- Temperature (°C)
+
+### Wave Mini Gen 1 (Model number: 2920)
+
+Sensor values are updated every 5 minutes.
+
+#### Sensor capabilities
+
+- Humidity (%rH)
+- Temperature (°C)
+- Atmospheric pressure (hPa)
+- VOC (ppb)
+
+### Wave Plus Gen 1 (Model number: 2930)
+
+Except for the radon measurements, the Wave Plus updates its current sensor values once every 5 minutes. Radon measurements are updated once every hour.
+
+#### Sensor capabilities
+
+- Humidity (%rH)
+- Radon short term average (Bp/m3)
+- Radon long term average (Bq/m3)
+- Temperature (°C)
+- Atmospheric pressure (hPa)
+- CO2 (ppm)
+- VOC (ppb)
+
+### Wave Gen 2 (Model number: 2950)
+
+On 2nd Gen Wave, temperature and humidity are updated every 5 minutes. On both devices, radon measurements are updated once every hour.
+
+#### Sensor capabilities
+
+- Humidity (%rH)
+- Radon short term average (Bp/m3)
+- Radon long term average (Bq/m3)
+- Temperature (°C)
