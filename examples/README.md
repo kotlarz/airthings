@@ -4,7 +4,7 @@ Various examples on how to use the framework.
 
 ## Discovery
 
-### Autodiscover all Airthings devices ([autodiscover_devices.py](./examples/autodiscover_devices.py))
+### Autodiscover all Airthings devices ([autodiscover_devices.py](./autodiscover_devices.py))
 
 `$ python examples/autodiscover_devices.py`
 
@@ -27,7 +27,7 @@ Found 1 Airthings devices:
 	 voc = YES
 ```
 
-### Finding Airthings devices by MAC addresses ([find_devices_by_mac_addresses.py](./examples/find_devices_by_mac_addresses.py))
+### Finding Airthings devices by MAC addresses ([find_devices_by_mac_addresses.py](./find_devices_by_mac_addresses.py))
 
 `$ python examples/find_devices_by_mac_addresses.py`
 
@@ -46,7 +46,7 @@ Found 1 Airthings devices:
 	Model number: 2930
 ```
 
-### Finding Airthings devices by identifiers ([find_devices_by_identifiers.py](./examples/find_devices_by_identifiers.py))
+### Finding Airthings devices by identifiers ([find_devices_by_identifiers.py](./find_devices_by_identifiers.py))
 
 _Identifiers are the last 6 digits of the serial number_
 
@@ -69,7 +69,7 @@ Found 1 Airthings devices:
 
 ## Measurements
 
-### Autodiscover and fetch measurements of all nearby Airthings devices ([fetch_measurements.py](./examples/fetch_measurements.py))
+### Autodiscover and fetch measurements of all nearby Airthings devices ([fetch_measurements.py](./fetch_measurements.py))
 
 `$ python examples/fetch_measurements.py`
 
@@ -91,7 +91,7 @@ Found 1 Airthings devices:
 	 65.0 ppb
 ```
 
-### Fetch measurement of Airthings devices specified by MAC addresses ([fetch_measurements_from_mac_addresses.py](./examples/fetch_measurements_from_mac_addresses.py))
+### Fetch measurement of Airthings devices specified by MAC addresses ([fetch_measurements_from_mac_addresses.py](./fetch_measurements_from_mac_addresses.py))
 
 _Identifiers are the last 6 digits of the serial number_
 
@@ -130,7 +130,7 @@ Found 1 Airthings devices:
 	 65.0 ppb
 ```
 
-### Fetch measurement of Airthings devices specified by identifiers ([fetch_measurements_from_identifiers.py](./examples/fetch_measurements_from_identifiers.py))
+### Fetch measurement of Airthings devices specified by identifiers ([fetch_measurements_from_identifiers.py](./fetch_measurements_from_identifiers.py))
 
 _Identifiers are the last 6 digits of the serial number_
 
@@ -171,7 +171,7 @@ Found 1 Airthings devices:
 
 ## Miscellaneous
 
-### Using sensor measurement variables ([sensor_variables.py](./examples/sensor_variables.py))
+### Using sensor measurement variables ([sensor_variables.py](./sensor_variables.py))
 
 `$ python examples/sensor_variables.py`
 
