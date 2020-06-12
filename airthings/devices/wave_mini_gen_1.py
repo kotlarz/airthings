@@ -40,7 +40,7 @@ class WaveMiniGen1(Device):
         SENSOR_RADON_SHORT_TERM_AVG_KEY: False,
         SENSOR_RADON_LONG_TERM_AVG_KEY: False,
         SENSOR_TEMPERATURE_KEY: True,
-        SENSOR_ATMOSPHERIC_PRESSURE_KEY: True,
+        SENSOR_ATMOSPHERIC_PRESSURE_KEY: False,
         SENSOR_CO2_KEY: False,
         SENSOR_VOC_KEY: True,
     }
@@ -48,9 +48,6 @@ class WaveMiniGen1(Device):
     def _parse_data(self, data):
         self._measurements[SENSOR_TEMPERATURE_KEY] = TemperatureSensor(
             round(data[1] / 100.0 - 273.15, 2)
-        )
-        self._measurements[SENSOR_ATMOSPHERIC_PRESSURE_KEY] = AtmosphericPressureSensor(
-            data[2] / 50.0
         )
         self._measurements[SENSOR_HUMIDITY_KEY] = HumiditySensor(data[3] / 100.0)
         self._measurements[SENSOR_VOC_KEY] = VOCSensor(data[4])
