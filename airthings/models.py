@@ -131,6 +131,10 @@ class Device:
         return self.LABEL
 
     @property
+    def measurements(self):
+        return self._measurements
+
+    @property
     def humidity(self):
         return self._measurements.get(SENSOR_HUMIDITY_KEY, None)
 
