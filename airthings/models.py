@@ -24,7 +24,7 @@ class Sensor:
         self._value = value
 
     def __repr__(self):
-        return "%s %s" % (self._value, self.unit)
+        return repr("%s %s" % (self._value, self.unit))
 
     @property
     def key(self):
@@ -66,11 +66,9 @@ class Device:
         self._has_measurements = False
 
     def __repr__(self):
-        return "<Device mac_address=%s serial_number=%s model_number=%s model=%s>" % (
-            self.mac_address,
-            self.serial_number,
-            self.model_number,
-            self.LABEL,
+        return repr(
+            "<Device mac_address=%s serial_number=%s model_number=%s model=%s>"
+            % (self.mac_address, self.serial_number, self.model_number, self.LABEL,)
         )
 
     def _fetch_raw_data(self):
