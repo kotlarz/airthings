@@ -59,7 +59,6 @@ Sensor values are updated every 5 minutes.
 
 - Humidity (%rH)
 - Temperature (°C)
-- Atmospheric pressure (hPa)
 - VOC (ppb)
 
 ### Wave Plus Gen 1 (Model number: 2930)
