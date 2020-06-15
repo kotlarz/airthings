@@ -106,8 +106,8 @@ class Device:
         )
         self._disconnect()
 
-    def _fetch_raw_data(self, connection_retries=3):
-        self._connect(connection_retries)
+    def _fetch_raw_data(self, connect_retries=3):
+        self._connect(connect_retries)
         raw_data = self._fetch_characteristics(self.DATA_UUID)
         self._disconnect()
         return raw_data
@@ -115,9 +115,9 @@ class Device:
     def _parse_raw_data(self, raw_data):
         return struct.unpack(self.RAW_DATA_FORMAT, raw_data)
 
-    def fetch_and_set_measurements(self, connection_retries=3):
-        self._connect(connection_retries)
-        raw_data = self._fetch_raw_data(connection_retries)
+    def fetch_and_set_measurements(self, connect_retries=3):
+        self._connect(connect_retries)
+        raw_data = self._fetch_raw_data(connect_retries)
         data = self._parse_raw_data(raw_data)
         # TODO: check sensor version
         self._parse_data(data)

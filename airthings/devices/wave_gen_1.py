@@ -57,8 +57,8 @@ class WaveGen1(Device):
         SENSOR_VOC_KEY: False,
     }
 
-    def _fetch_raw_data(self, connection_retries=3):
-        self._connect(connection_retries)
+    def _fetch_raw_data(self, connect_retries=3):
+        self._connect(connect_retries)
         raw_data = self._fetch_characteristics(self.UUID_DATETIME)
         raw_data += self._fetch_characteristics(self.UUID_HUMIDITY)
         raw_data += self._fetch_characteristics(self.UUID_TEMPERATURE)

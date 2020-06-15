@@ -10,7 +10,7 @@ from .utils import determine_device_model, determine_device_model_from_mac_addre
 # General
 SCAN_TIMEOUT = 3  # Seconds
 SCAN_RETRIES = 3  # Times
-CONNECTION_RETRIES = 3  # Times
+CONNECT_RETRIES = 3  # Times
 
 
 def discover_devices(
@@ -100,7 +100,7 @@ def find_device_by_serial_number(serial_number, timeout=SCAN_TIMEOUT):
     return devices[0] if devices else None
 
 
-def fetch_measurements_from_devices(devices, connection_retries=CONNECTION_RETRIES):
+def fetch_measurements_from_devices(devices, connect_retries=CONNECT_RETRIES):
     """
     Fetch measurements from a list of Airthings devices.
     """
@@ -108,11 +108,11 @@ def fetch_measurements_from_devices(devices, connection_retries=CONNECTION_RETRI
         current_retries = 0
         while True:
             try:
-                device.fetch_and_set_measurements(connection_retries)
+                device.fetch_and_set_measurements(connect_retries)
                 break
             except btle.BTLEDisconnectError as _:  # noqa: F841
                 # TODO: better error handling
-                if current_retries == connection_retries:
+                if current_retries == connect_retries:
                     break
                 current_retries += 1
 
@@ -124,7 +124,7 @@ def fetch_measurements(
     serial_numbers=None,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
-    connection_retries=CONNECTION_RETRIES,
+    connect_retries=CONNECT_RETRIES,
 ):
     """
     Fetch measurements from Airthings devices either automatically, by MAC addresses or by serial numbers
@@ -144,7 +144,7 @@ def fetch_measurements(
                     device = determine_device_model_from_mac_address(mac_address)
                 except btle.BTLEDisconnectError as _:  # noqa: F841
                     # TODO: better error handling
-                    if current_retries == connection_retries:
+                    if current_retries == connect_retries:
                         break
                     current_retries += 1
             if device is None:
@@ -163,7 +163,7 @@ def fetch_measurements(
         )
 
     return fetch_measurements_from_devices(
-        devices=airthings_devices, connection_retries=connection_retries
+        devices=airthings_devices, connect_retries=connect_retries
     )
 
 
@@ -171,7 +171,7 @@ def fetch_measurements_from_serial_numbers(
     serial_numbers,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
-    connection_retries=CONNECTION_RETRIES,
+    connect_retries=CONNECT_RETRIES,
 ):
     """
     Fetch measurements from a list of Airthings device serial numbers.
@@ -181,7 +181,7 @@ def fetch_measurements_from_serial_numbers(
         serial_numbers=serial_numbers,
         scan_timeout=scan_timeout,
         scan_retries=scan_retries,
-        connection_retries=connection_retries,
+        connect_retries=connect_retries,
     )
 
 
@@ -189,7 +189,7 @@ def fetch_measurements_from_serial_number(
     serial_number,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
-    connection_retries=CONNECTION_RETRIES,
+    connect_retries=CONNECT_RETRIES,
 ):
     """
     Fetch measurements from a specific Airthings device serial number.
@@ -198,7 +198,7 @@ def fetch_measurements_from_serial_number(
         serial_numbers=[serial_number],
         scan_timeout=scan_timeout,
         scan_retries=scan_retries,
-        connection_retries=connection_retries,
+        connect_retries=connect_retries,
     )
     return devices[0] if devices else None
 
@@ -207,7 +207,7 @@ def fetch_measurements_from_mac_addresses(
     mac_addresses,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
-    connection_retries=CONNECTION_RETRIES,
+    connect_retries=CONNECT_RETRIES,
 ):
     """
     Fetch measurements from a list of Airthings device MAC addresses.
@@ -217,7 +217,7 @@ def fetch_measurements_from_mac_addresses(
         mac_addresses=mac_addresses,
         scan_timeout=scan_timeout,
         scan_retries=scan_retries,
-        connection_retries=connection_retries,
+        connect_retries=connect_retries,
     )
 
 
@@ -225,7 +225,7 @@ def fetch_measurements_from_mac_address(
     mac_address,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
-    connection_retries=CONNECTION_RETRIES,
+    connect_retries=CONNECT_RETRIES,
 ):
     """
     Fetch measurements from a specific Airthings device MAC address.
@@ -234,6 +234,6 @@ def fetch_measurements_from_mac_address(
         mac_addresses=[mac_address],
         scan_timeout=scan_timeout,
         scan_retries=scan_retries,
-        connection_retries=connection_retries,
+        connect_retries=connect_retries,
     )
     return devices[0] if devices else None
