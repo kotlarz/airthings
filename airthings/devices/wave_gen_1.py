@@ -57,18 +57,13 @@ class WaveGen1(Device):
         SENSOR_VOC_KEY: False,
     }
 
-    def _fetch_raw_data(self):
-        periph = btle.Peripheral(self.mac_address)
-        datetime_char = periph.getCharacteristics(uuid=self.UUID_DATETIME)[0]
-        humidity_char = periph.getCharacteristics(uuid=self.UUID_HUMIDITY)[0]
-        temperature_char = periph.getCharacteristics(uuid=self.UUID_TEMPERATURE)[0]
-        radon_sta_char = periph.getCharacteristics(uuid=self.UUID_RADON_STA)[0]
-        radon_lta_char = periph.getCharacteristics(uuid=self.UUID_RADON_LTA)[0]
-        raw_data = datetime_char.read()
-        raw_data += humidity_char.read()
-        raw_data += temperature_char.read()
-        raw_data += radon_sta_char.read()
-        raw_data += radon_lta_char.read()
+    def _fetch_raw_data(self, connection_retries=3):
+        self._connect(connection_retries)
+        raw_data = self._fetch_characteristics(self.UUID_DATETIME)
+        raw_data += self._fetch_characteristics(self.UUID_HUMIDITY)
+        raw_data += self._fetch_characteristics(self.UUID_TEMPERATURE)
+        raw_data += self._fetch_characteristics(self.UUID_RADON_STA)
+        raw_data += self._fetch_characteristics(self.UUID_RADON_LTA)
         periph.disconnect()
         return raw_data
 

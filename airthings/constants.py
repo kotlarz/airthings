@@ -1,6 +1,5 @@
 # General
 DEVICE_MODEL_NUMBER_LENGTH = 4
-DEVICE_IDENTIFIER_LENGTH = 6
 
 # Sensors
 ## Humidity

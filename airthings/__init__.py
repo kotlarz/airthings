@@ -1,11 +1,11 @@
 import struct
 import sys
 import time
-from pprint import pprint
 
 import bluepy.btle as btle
 
-from .utils import determine_device_model
+from .models import Device
+from .utils import determine_device_model, determine_device_model_from_mac_address
 
 # General
 SCAN_TIMEOUT = 3  # Seconds
@@ -15,12 +15,12 @@ CONNECTION_RETRIES = 3  # Times
 
 def discover_devices(
     mac_addresses=None,
-    identifiers=None,
+    serial_numbers=None,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
 ):
     """
-    Discover Airthings devices either automatically, by MAC addresses or by identifiers
+    Discover Airthings devices either automatically, by MAC addresses or by serial_number
     """
     airthings_devices = []
     current_retries = 0
@@ -35,8 +35,8 @@ def discover_devices(
                         # MAC addresses are set, and the device MAC address does not
                         # match any in the list.
                         continue
-                    elif identifiers and device.identifier not in identifiers:
-                        # Identifiers are set, and the device identifier does not match
+                    elif serial_numbers and device.serial_number not in serial_numbers:
+                        # Serial numbers are set, and the device serial number does not match
                         # any in the list.
                         continue
 
@@ -79,22 +79,24 @@ def find_device_by_mac_address(
     return devices[0] if devices else None
 
 
-def find_devices_by_identifiers(
-    identifiers, scan_timeout=SCAN_TIMEOUT, scan_retries=SCAN_RETRIES
+def find_devices_by_serial_numbers(
+    serial_numbers, scan_timeout=SCAN_TIMEOUT, scan_retries=SCAN_RETRIES
 ):
     """
-    Find Airthings devices by using a list of identifiers (the last 6 digits of a serial number).
+    Find Airthings devices by using a list of serial numbers (6 digits).
     """
     return discover_devices(
-        identifiers=identifiers, scan_timeout=SCAN_TIMEOUT, scan_retries=SCAN_RETRIES
+        serial_numbers=serial_numbers,
+        scan_timeout=SCAN_TIMEOUT,
+        scan_retries=SCAN_RETRIES,
     )
 
 
-def find_device_by_identifier(identifier, timeout=SCAN_TIMEOUT):
+def find_device_by_serial_number(serial_number, timeout=SCAN_TIMEOUT):
     """
-    Find a single Airthings device by using an identifier (the last 6 digits of aserial number).
+    Find a single Airthings device by using a serial number (6 digits).
     """
-    devices = find_devices_by_identifiers([identifier])
+    devices = find_devices_by_serial_numbers([serial_number])
     return devices[0] if devices else None
 
 
@@ -102,11 +104,11 @@ def fetch_measurements_from_devices(devices, connection_retries=CONNECTION_RETRI
     """
     Fetch measurements from a list of Airthings devices.
     """
-    current_retries = 0
     for device in devices:
+        current_retries = 0
         while True:
             try:
-                device.fetch_and_set_measurements()
+                device.fetch_and_set_measurements(connection_retries)
                 break
             except btle.BTLEDisconnectError as _:  # noqa: F841
                 # TODO: better error handling
@@ -119,56 +121,81 @@ def fetch_measurements_from_devices(devices, connection_retries=CONNECTION_RETRI
 
 def fetch_measurements(
     mac_addresses=None,
-    identifiers=None,
+    serial_numbers=None,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
     connection_retries=CONNECTION_RETRIES,
 ):
     """
-    Fetch measurements from Airthings devices either automatically, by MAC addresses or by identifiers
+    Fetch measurements from Airthings devices either automatically, by MAC addresses or by serial numbers
     """
+    if mac_addresses:
+        """
+        We do not need to discover as we already have their MAC addresses.
+        We do however need to identify which model, which is normally done on
+        discovery.
+        """
+        airthings_devices = []
+        for mac_address in mac_addresses:
+            current_retries = 0
+            device = None
+            while True:
+                try:
+                    device = determine_device_model_from_mac_address(mac_address)
+                except btle.BTLEDisconnectError as _:  # noqa: F841
+                    # TODO: better error handling
+                    if current_retries == connection_retries:
+                        break
+                    current_retries += 1
+            if device is None:
+                # Could not determine device model/class
+                # TODO: raise error?
+                continue
+            airthings_devices.append(device)
 
-    airthings_devices = discover_devices(
-        mac_addresses=mac_addresses,
-        identifiers=identifiers,
-        scan_timeout=scan_timeout,
-        scan_retries=scan_retries,
-    )
+    else:
+        # Discover the devices automatically
+        airthings_devices = discover_devices(
+            mac_addresses=mac_addresses,
+            serial_numbers=serial_numbers,
+            scan_timeout=scan_timeout,
+            scan_retries=scan_retries,
+        )
 
     return fetch_measurements_from_devices(
         devices=airthings_devices, connection_retries=connection_retries
     )
 
 
-def fetch_measurements_from_identifiers(
-    identifiers,
+def fetch_measurements_from_serial_numbers(
+    serial_numbers,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
     connection_retries=CONNECTION_RETRIES,
 ):
     """
-    Fetch measurements from a list of Airthings device identifiers.
+    Fetch measurements from a list of Airthings device serial numbers.
     """
 
     return fetch_measurements(
-        identifiers=identifiers,
+        serial_numbers=serial_numbers,
         scan_timeout=scan_timeout,
         scan_retries=scan_retries,
         connection_retries=connection_retries,
     )
 
 
-def fetch_measurements_from_identifier(
-    identifier,
+def fetch_measurements_from_serial_number(
+    serial_number,
     scan_timeout=SCAN_TIMEOUT,
     scan_retries=SCAN_RETRIES,
     connection_retries=CONNECTION_RETRIES,
 ):
     """
-    Fetch measurements from a specific Airthings device identifier.
+    Fetch measurements from a specific Airthings device serial number.
     """
-    devices = fetch_measurements_from_identifiers(
-        identifiers=[identifier],
+    devices = fetch_measurements_from_serial_numbers(
+        serial_numbers=[serial_number],
         scan_timeout=scan_timeout,
         scan_retries=scan_retries,
         connection_retries=connection_retries,
