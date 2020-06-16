@@ -6,6 +6,8 @@ from airthings.devices import DEVICE_MODELS
 
 
 def fetch_characteristics(peripheral, uuid):
+    if peripheral is None:
+        raise ValueError("Peripheral cannot be None")
     characteristics = peripheral.getCharacteristics(uuid=uuid)
     if len(characteristics) != 1:
         raise ValueError(

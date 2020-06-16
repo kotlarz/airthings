@@ -63,7 +63,6 @@ class Device:
         self._has_measurements = False
         self._debug_information = None
         self._has_debug_information = False
-        self._is_connected = False
         self._peripheral = peripheral
 
     def __repr__(self):
@@ -73,13 +72,18 @@ class Device:
         )
 
     def _connect(self, connect_retries):
-        if self._is_connected:
+        if self.is_connected:
             return
         current_retries = 0
         while True:
             try:
+                if self._peripheral is not None:
+                    # Try to disconnect from peripheral
+                    try:
+                        self._peripheral.disconnect()
+                    except:  # noqa: F841
+                        pass
                 self._peripheral = btle.Peripheral(self.mac_address)
-                self._is_connected = True
                 break
             except Exception as _:  # noqa: F841
                 # TODO: better error handling
@@ -90,7 +94,6 @@ class Device:
     def _disconnect(self):
         self._peripheral.disconnect()
         self._peripheral = None
-        self._is_connected = False
 
     def _fetch_characteristics(self, uuid):
         from .utils import fetch_characteristics
@@ -124,8 +127,20 @@ class Device:
         self._has_measurements = True
 
     @property
+    def is_connected(self):
+        """
+        function: getState()
+        Returns a string indicating device state. Possible states are:
+            "conn" - connected,
+            "disc" - disconnected
+            "scan" scanning
+            "tryconn" - connecting
+        """
+        return self._peripheral is not None and self._peripheral.getState() != "disc"
+
+    @property
     def connection(self):
-        if not self._is_connected:
+        if not self.is_connected:
             self._connect(connect_retries=3)
         return self._peripheral
 
