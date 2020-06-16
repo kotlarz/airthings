@@ -59,11 +59,11 @@ class WaveGen1(Device):
 
     def _fetch_raw_data(self, connect_retries=3):
         self._connect(connect_retries)
-        raw_data = self._fetch_characteristics(self.UUID_DATETIME)
-        raw_data += self._fetch_characteristics(self.UUID_HUMIDITY)
-        raw_data += self._fetch_characteristics(self.UUID_TEMPERATURE)
-        raw_data += self._fetch_characteristics(self.UUID_RADON_STA)
-        raw_data += self._fetch_characteristics(self.UUID_RADON_LTA)
+        raw_data = self._fetch_characteristic(self.UUID_DATETIME)
+        raw_data += self._fetch_characteristic(self.UUID_HUMIDITY)
+        raw_data += self._fetch_characteristic(self.UUID_TEMPERATURE)
+        raw_data += self._fetch_characteristic(self.UUID_RADON_STA)
+        raw_data += self._fetch_characteristic(self.UUID_RADON_LTA)
         self._disconnect()
         return raw_data
 

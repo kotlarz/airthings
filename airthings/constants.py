@@ -1,6 +1,13 @@
 # General
 DEVICE_MODEL_NUMBER_LENGTH = 4
 
+DEFAULT_SCAN_TIMEOUT = 3  # Seconds
+DEFAULT_SCAN_RETRIES = 5  # Times
+DEFAULT_SCAN_SLEEP = 1  # Seconds
+DEFAULT_CONNECT_RETRIES = 6  # Times
+DEFAULT_CONNECT_SLEEP = 10  # Seconds
+
+
 # Sensors
 ## Humidity
 SENSOR_HUMIDITY_KEY = "humidity"

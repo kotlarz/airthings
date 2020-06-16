@@ -1,34 +1,43 @@
+import logging
 import struct
 
 import bluepy.btle as btle
 
-from airthings.devices import DEVICE_MODELS
+from .devices import DEVICE_MODELS
+from .exceptions import AirthingsModelNotImplementedException
+
+_LOGGER = logging.getLogger(__name__)
 
 
-def fetch_characteristics(peripheral, uuid):
+def fetch_characteristic(peripheral, uuid):
     if peripheral is None:
         raise ValueError("Peripheral cannot be None")
     characteristics = peripheral.getCharacteristics(uuid=uuid)
     if len(characteristics) != 1:
-        raise ValueError(
-            "fetch_characteristics did not return exactly 1 characteristic"
-        )
+        raise ValueError("fetch_characteristic did not return exactly 1 characteristic")
     characteristic = characteristics[0]
     return characteristic.read()
 
 
 def determine_device_model_from_mac_address(mac_address):
     peripheral = btle.Peripheral(mac_address)
-    model_number = fetch_characteristics(
+    model_number = fetch_characteristic(
         peripheral, btle.AssignedNumbers.modelNumberString
     ).decode("utf-8")
-    serial_number = fetch_characteristics(
+    serial_number = fetch_characteristic(
         peripheral, btle.AssignedNumbers.serialNumberString
     ).decode("utf-8")
     model = determine_model_class(model_number)
+
     if not model:
-        # TODO: Add warning about an unimplemented device
-        return None
+        try:
+            _LOGGER.warning(
+                "Could not determine Airthings model from MAC address: %s. serial_number = %s"
+                % (mac_address, serial_number)
+            )
+        except AirthingsModelNotImplementedException as e:
+            raise e
+
     return model(mac_address, serial_number, peripheral=peripheral)
 
 
@@ -37,7 +46,10 @@ def determine_model_class(model_number):
         if model_number == model.MODEL_NUMBER:
             return model
     else:
-        return None
+        _LOGGER.warning(
+            "Could not determine Airthings model from model number: %s. Most likely an unimplemented model, or not an Airthings device."
+        )
+        raise AirthingsModelNotImplementedException(model_number)
 
 
 def determine_device_model(dev):
@@ -51,9 +63,6 @@ def determine_device_model(dev):
     model_number = identifier[:4]
     serial_number = identifier[4:]
     model = determine_model_class(model_number)
-    if not model:
-        # TODO: Add warning about an unimplemented device
-        return None
     return model(mac_address, serial_number)
 
 
