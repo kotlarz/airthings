@@ -1,6 +1,7 @@
 import struct
 
 import bluepy.btle as btle
+
 from .constants import (
     DEVICE_MODEL_NUMBER_LENGTH,
     SENSOR_ATMOSPHERIC_PRESSURE_KEY,
