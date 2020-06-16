@@ -64,7 +64,7 @@ class WaveGen1(Device):
         raw_data += self._fetch_characteristics(self.UUID_TEMPERATURE)
         raw_data += self._fetch_characteristics(self.UUID_RADON_STA)
         raw_data += self._fetch_characteristics(self.UUID_RADON_LTA)
-        periph.disconnect()
+        self._disconnect()
         return raw_data
 
     def _parse_data(self, data):
