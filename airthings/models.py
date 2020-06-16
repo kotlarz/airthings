@@ -82,11 +82,11 @@ class Device:
                     # Try to disconnect from peripheral
                     try:
                         self._peripheral.disconnect()
-                    except Exception as _:  # noqa: F841
+                    except Exception:
                         pass
                 self._peripheral = btle.Peripheral(self.mac_address)
                 break
-            except Exception as _:  # noqa: F841
+            except btle.BTLEException as e:
                 # TODO: better error handling
                 if current_retries == connect_retries:
                     break

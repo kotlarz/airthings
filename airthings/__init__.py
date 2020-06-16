@@ -43,7 +43,7 @@ def discover_devices(
                     # Device is an Airthings device
                     airthings_devices.append(device)
             break
-        except Exception as _:  # noqa: F841
+        except btle.BTLEException as e:
             # TODO: better error handling
             if current_retries == scan_retries:
                 break
@@ -110,7 +110,7 @@ def fetch_measurements_from_devices(devices, connect_retries=CONNECT_RETRIES):
             try:
                 device.fetch_and_set_measurements(connect_retries)
                 break
-            except btle.BTLEDisconnectError as _:  # noqa: F841
+            except btle.BTLEDisconnectError:
                 # TODO: better error handling
                 if current_retries == connect_retries:
                     break
@@ -142,7 +142,7 @@ def fetch_measurements(
             while True:
                 try:
                     device = determine_device_model_from_mac_address(mac_address)
-                except btle.BTLEDisconnectError as _:  # noqa: F841
+                except btle.BTLEDisconnectError:
                     # TODO: better error handling
                     if current_retries == connect_retries:
                         break
