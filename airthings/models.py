@@ -175,7 +175,17 @@ class Device:
             "scan" scanning
             "tryconn" - connecting
         """
-        return self._peripheral is not None and self._peripheral.getState() != "disc"
+        if not self._peripheral:
+            return False
+
+        try:
+            return self._peripheral.getState() != "disc"
+        except btle.BTLEException as e:
+            _LOGGER.warning(
+                "Could not check if device is connected, assuming it's not connected"
+            )
+            _LOGGER.debug(e)
+            return False
 
     @property
     def connection(self):
