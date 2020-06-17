@@ -30,7 +30,7 @@ class Sensor:
         self._value = value
 
     def __repr__(self):
-        return repr("%s %s" % (self._value, self.unit))
+        return repr("{} {}".format(self._value, self.unit))
 
     @property
     def key(self):
@@ -85,8 +85,9 @@ class Device:
 
     def __repr__(self):
         return repr(
-            "<Device mac_address=%s serial_number=%s model_number=%s model=%s>"
-            % (self.mac_address, self.serial_number, self.model_number, self.LABEL,)
+            "<Device mac_address={} serial_number={} model_number={} model={}>".format(
+                self.mac_address, self.serial_number, self.model_number, self.LABEL,
+            )
         )
 
     def _connect(self):
@@ -115,8 +116,9 @@ class Device:
 
                 _LOGGER.debug(e)
                 _LOGGER.debug(
-                    "device._connect failed, retrying connect in %d seconds... Current retries = %d out of %d"
-                    % (self._reconnect_sleep, current_retries, self._connect_attempts)
+                    "device._connect failed, retrying connect in {} seconds... Current retries = {} out of {}".format(
+                        self._reconnect_sleep, current_retries, self._connect_attempts
+                    )
                 )
 
                 time.sleep(self._reconnect_sleep)

@@ -37,8 +37,9 @@ def discover_devices(
     """
     _LOGGER.debug("Starting to scan and discover Airthings devices.")
     _LOGGER.debug(
-        "Scan attempts = %d times, Scan timeout = %d seconds, Rescan sleep = %d seconds"
-        % (scan_attempts, scan_timeout, rescan_sleep)
+        "Scan attempts = {} times, Scan timeout = {} seconds, Rescan sleep = {} seconds".format(
+            scan_attempts, scan_timeout, rescan_sleep
+        )
     )
     if mac_addresses:
         _LOGGER.debug(
@@ -66,16 +67,18 @@ def discover_devices(
                         # MAC addresses are set, and the device MAC address does not
                         # match any in the list.
                         _LOGGER.debug(
-                            "MAC address: %s is not in our mac_addresses list"
-                            % device.mac_address
+                            "MAC address: {} is not in our mac_addresses list, ignoring it".format(
+                                device.mac_address
+                            )
                         )
                         continue
                     elif serial_numbers and device.serial_number not in serial_numbers:
                         # Serial numbers are set, and the device serial number does not match
                         # any in the list.
                         _LOGGER.debug(
-                            "Serial number: %s is not in our serial_numbers list"
-                            % device.serial_number
+                            "Serial number: {} is not in our serial_numbers list, ignoring it".format(
+                                device.serial_number
+                            )
                         )
                         continue
 
@@ -92,8 +95,9 @@ def discover_devices(
 
             _LOGGER.debug(e)
             _LOGGER.debug(
-                "discover_devices scan failed, retrying in %d seconds... Current retries = %d out of %d"
-                % (rescan_sleep, current_retries, scan_attempts)
+                "discover_devices scan failed, retrying in {} seconds... Current retries = {} out of {}".format(
+                    rescan_sleep, current_retries, scan_attempts
+                )
             )
 
             time.sleep(rescan_sleep)
@@ -183,15 +187,17 @@ def fetch_measurements_from_devices(
 
                 _LOGGER.debug(e)
                 _LOGGER.debug(
-                    "fetch_measurements_from_devices scan failed, retrying connect in %d seconds... Current retries = %d out of %d"
-                    % (reconnect_sleep, current_retries, connect_attempts)
+                    "fetch_measurements_from_devices scan failed, retrying connect in {} seconds... Current retries = {} out of {}".format(
+                        reconnect_sleep, current_retries, connect_attempts
+                    )
                 )
 
                 time.sleep(reconnect_sleep)
 
         _LOGGER.debug(
-            "Sleeping %d seconds before fetching and settings measurements from the next Airthings device"
-            % next_connect_sleep
+            "Sleeping {} seconds before fetching and settings measurements from the next Airthings device".format(
+                next_connect_sleep
+            )
         )
         time.sleep(next_connect_sleep)
 
@@ -215,8 +221,7 @@ def fetch_measurements(
 
     _LOGGER.debug("Starting to fetch measurements from Airthings devices")
     _LOGGER.debug(
-        "Scan attempts = %d times, Scan timeout = %d seconds, Rescan sleep = %d seconds, Connect attempts = %d times, Reconnect sleep = %d seconds, Next connect sleep = %d seconds, Before fetch sleep = %d seconds"
-        % (
+        "Scan attempts = {} times, Scan timeout = {} seconds, Rescan sleep = {} seconds, Connect attempts = {} times, Reconnect sleep = {} seconds, Next connect sleep = {} seconds, Before fetch sleep = {} seconds".format(
             scan_attempts,
             scan_timeout,
             rescan_sleep,
@@ -237,6 +242,18 @@ def fetch_measurements(
             "We are only fetching measurements from Airthings devices with the following serial numbers:"
         )
         _LOGGER.debug(serial_numbers)
+
+        _LOGGER.debug(
+            "Checking if the serial numbers are valid Airthings serial numbers"
+        )
+        for serial_number in serial_numbers:
+            device_class = determine_device_class_from_serial_number(serial_number)
+            _LOGGER.debug(
+                "Matched serial number {} with Airthings device model: {}".format(
+                    serial_number, device_class.LABEL
+                )
+            )
+
     else:
         _LOGGER.debug(
             "We are automatically discovering all nearby Airthings devices and fetching measurements from them"
@@ -265,26 +282,15 @@ def fetch_measurements(
 
                     _LOGGER.debug(e)
                     _LOGGER.debug(
-                        "determine_device_from_mac_address failed, retrying connect in %d seconds... Current retries = %d out of %d"
-                        % (reconnect_sleep, current_retries, connect_attempts)
+                        "determine_device_from_mac_address failed, retrying connect in {} seconds... Current retries = {} out of {}".format(
+                            reconnect_sleep, current_retries, connect_attempts
+                        )
                     )
 
                     time.sleep(reconnect_sleep)
 
             airthings_devices.append(device)
     else:
-        if serial_numbers:
-            # Check if serial numbers are valid Airthings serial numbers
-            _LOGGER.debug(
-                "Serial numbers are set, checking if they are Airthings serial numbers"
-            )
-            for serial_number in serial_numbers:
-                device_class = determine_device_class_from_serial_number(serial_number)
-                _LOGGER.debug(
-                    "Matched serial number %s with Airthings device: %s"
-                    % (serial_number, device_class.LABEL)
-                )
-
         # Discover the devices automatically
         _LOGGER.debug(
             "MAC addresses are not set, automatically discovering nearby Airthings devices"
@@ -294,8 +300,9 @@ def fetch_measurements(
         )
 
     _LOGGER.debug(
-        "Sleeping %d seconds before fetching measurements from Airthings devices"
-        % before_fetch_sleep
+        "Sleeping {} seconds before fetching measurements from Airthings devices".format(
+            before_fetch_sleep
+        )
     )
     time.sleep(before_fetch_sleep)
 
