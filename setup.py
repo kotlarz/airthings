@@ -18,7 +18,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/kotlarz/airthings",
     packages=setuptools.find_packages(),
-    install_requires=["bluepy==1.3.0"],
+    install_requires=["bluepy==1.2.0"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
