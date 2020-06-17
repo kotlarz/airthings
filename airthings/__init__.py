@@ -6,13 +6,15 @@ import time
 import bluepy.btle as btle
 
 from .constants import (
-    DEFAULT_CONNECT_RETRIES,
-    DEFAULT_CONNECT_SLEEP,
-    DEFAULT_SCAN_RETRIES,
-    DEFAULT_SCAN_SLEEP,
+    DEFAULT_BEFORE_FETCH_SLEEP,
+    DEFAULT_CONNECT_ATTEMPTS,
+    DEFAULT_NEXT_CONNECT_SLEEP,
+    DEFAULT_RECONNECT_SLEEP,
+    DEFAULT_RESCAN_SLEEP,
+    DEFAULT_SCAN_ATTEMPTS,
     DEFAULT_SCAN_TIMEOUT,
 )
-from .exceptions import OutOfConnectRetriesException, OutOfScanRetriesException
+from .exceptions import OutOfConnectAttemptsException, OutOfScanAttemptsException
 from .models import Device
 from .utils import determine_device_model, determine_device_model_from_mac_address
 
@@ -22,17 +24,17 @@ _LOGGER = logging.getLogger(__name__)
 def discover_devices(
     mac_addresses=None,
     serial_numbers=None,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
 ):
     """
     Discover Airthings devices either automatically, by MAC addresses or by serial_number
     """
     _LOGGER.debug("Starting to scan and discover Airthings devices.")
     _LOGGER.debug(
-        "Scan timeout = %d seconds, Scan retries = %d times, Scan sleep = %d seconds"
-        % (scan_timeout, scan_retries, scan_sleep)
+        "Scan attempts = %d times, Scan timeout = %d seconds, Rescan sleep = %d seconds"
+        % (scan_attempts, scan_timeout, rescan_sleep)
     )
     if mac_addresses:
         _LOGGER.debug(
@@ -77,18 +79,20 @@ def discover_devices(
                     airthings_devices.append(device)
             break
         except btle.BTLEException as e:
-            if current_retries == scan_retries:
-                raise OutOfScanRetriesException(scan_timeout, scan_retries, scan_sleep)
+            if current_retries == scan_attempts:
+                raise OutOfScanAttemptsException(
+                    scan_attempts, scan_timeout, rescan_sleep
+                )
 
             current_retries += 1
 
             _LOGGER.debug(e)
             _LOGGER.debug(
                 "discover_devices scan failed, retrying in %d seconds... Current retries = %d out of %d"
-                % (scan_sleep, current_retries, scan_retries)
+                % (rescan_sleep, current_retries, scan_attempts)
             )
 
-            time.sleep(scan_sleep)
+            time.sleep(rescan_sleep)
 
     _LOGGER.debug("discover_devices discovered the following Airthings devices:")
     _LOGGER.debug(airthings_devices)
@@ -98,62 +102,63 @@ def discover_devices(
 
 def find_devices_by_mac_addresses(
     mac_addresses,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
 ):
     """
     Find Airthings devices by using a list of MAC addresses.
     """
-    return discover_devices(mac_addresses, scan_timeout, scan_retries, scan_sleep)
+    return discover_devices(mac_addresses, scan_attempts, scan_timeout, rescan_sleep)
 
 
 def find_device_by_mac_address(
     mac_address,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
 ):
     """
     Find a single Airthings device by searching for a MAC address.
     """
     devices = find_devices_by_mac_addresses(
-        [mac_address], scan_timeout, scan_retries, scan_sleep
+        [mac_address], scan_attempts, scan_timeout, rescan_sleep
     )
     return devices[0] if devices else None
 
 
 def find_devices_by_serial_numbers(
     serial_numbers,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
 ):
     """
     Find Airthings devices by using a list of serial numbers (6 digits).
     """
-    return discover_devices(serial_numbers, scan_timeout, scan_retries, scan_sleep)
+    return discover_devices(serial_numbers, scan_attempts, scan_timeout, rescan_sleep)
 
 
 def find_device_by_serial_number(
     serial_number,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
 ):
     """
     Find a single Airthings device by using a serial number (6 digits).
     """
     devices = find_devices_by_serial_numbers(
-        [serial_number], scan_timeout, scan_retries, scan_sleep
+        [serial_number], scan_attempts, scan_timeout, rescan_sleep
     )
     return devices[0] if devices else None
 
 
 def fetch_measurements_from_devices(
     devices,
-    connect_retries=DEFAULT_CONNECT_RETRIES,
-    connect_sleep=DEFAULT_CONNECT_SLEEP,
+    connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+    reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+    next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
 ):
     """
     Fetch measurements from a list of Airthings devices.
@@ -162,21 +167,29 @@ def fetch_measurements_from_devices(
         current_retries = 0
         while True:
             try:
-                device.fetch_and_set_measurements(connect_retries)
+                device.fetch_and_set_measurements(connect_attempts)
                 break
             except btle.BTLEDisconnectError as e:
-                if current_retries == connect_retries:
-                    raise OutOfConnectRetriesException(connect_retries, connect_sleep)
+                if current_retries == connect_attempts:
+                    raise OutOfConnectAttemptsException(
+                        connect_attempts, reconnect_sleep, next_connect_sleep
+                    )
 
                 current_retries += 1
 
                 _LOGGER.debug(e)
                 _LOGGER.debug(
                     "fetch_measurements_from_devices scan failed, retrying connect in %d seconds... Current retries = %d out of %d"
-                    % (connect_sleep, current_retries, connect_retries)
+                    % (reconnect_sleep, current_retries, connect_attempts)
                 )
 
-                time.sleep(connect_sleep)
+                time.sleep(reconnect_sleep)
+
+        _LOGGER.debug(
+            "Sleeping %d seconds before fetching and settings measurements from the next Airthings device"
+            % next_connect_sleep
+        )
+        time.sleep(next_connect_sleep)
 
     return devices
 
@@ -184,11 +197,13 @@ def fetch_measurements_from_devices(
 def fetch_measurements(
     mac_addresses=None,
     serial_numbers=None,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
-    connect_retries=DEFAULT_CONNECT_RETRIES,
-    connect_sleep=DEFAULT_CONNECT_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
+    connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+    reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+    next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
+    before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
 ):
     """
     Fetch measurements from Airthings devices either automatically, by MAC addresses or by serial numbers
@@ -196,8 +211,16 @@ def fetch_measurements(
 
     _LOGGER.debug("Starting to fetch measurements from Airthings devices")
     _LOGGER.debug(
-        "Scan timeout = %d seconds, Scan retries = %d times, Scan sleep = %d seconds, Connect retries = %d times, Connect sleep = %d seconds"
-        % (scan_timeout, scan_retries, scan_sleep, connect_retries, connect_sleep)
+        "Scan attempts = %d times, Scan timeout = %d seconds, Rescan sleep = %d seconds, Connect attempts = %d times, Reconnect sleep = %d seconds, Next connect sleep = %d seconds, Before fetch sleep = %d seconds"
+        % (
+            scan_attempts,
+            scan_timeout,
+            rescan_sleep,
+            connect_attempts,
+            reconnect_sleep,
+            next_connect_sleep,
+            before_fetch_sleep,
+        )
     )
 
     if mac_addresses:
@@ -229,9 +252,9 @@ def fetch_measurements(
                 try:
                     device = determine_device_model_from_mac_address(mac_address)
                 except btle.BTLEDisconnectError as e:
-                    if current_retries == connect_retries:
-                        raise OutOfConnectRetriesException(
-                            connect_retries, connect_sleep
+                    if current_retries == connect_attempts:
+                        raise OutOfConnectAttemptsException(
+                            connect_attempts, reconnect_sleep, next_connect_sleep
                         )
 
                     current_retries += 1
@@ -239,31 +262,42 @@ def fetch_measurements(
                     _LOGGER.debug(e)
                     _LOGGER.debug(
                         "determine_device_model_from_mac_addres failed, retrying connect in %d seconds... Current retries = %d out of %d"
-                        % (connect_sleep, current_retries, connect_retries)
+                        % (reconnect_sleep, current_retries, connect_attempts)
                     )
 
-                    time.sleep(connect_sleep)
+                    time.sleep(reconnect_sleep)
 
             airthings_devices.append(device)
 
     else:
         # Discover the devices automatically
+        _LOGGER.debug(
+            "MAC addresses are not set, automatically discovering nearby Airthings devices"
+        )
         airthings_devices = discover_devices(
-            mac_addresses, serial_numbers, scan_timeout, scan_retries, scan_sleep,
+            mac_addresses, serial_numbers, scan_timeout, scan_attempts, rescan_sleep,
         )
 
+    _LOGGER.debug(
+        "Sleeping %d seconds before fetching measurements from devices"
+        % before_fetch_sleep
+    )
+    time.sleep(before_fetch_sleep)
+
     return fetch_measurements_from_devices(
-        airthings_devices, connect_retries, connect_sleep
+        airthings_devices, connect_attempts, reconnect_sleep
     )
 
 
 def fetch_measurements_from_serial_numbers(
     serial_numbers,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
-    connect_retries=DEFAULT_CONNECT_RETRIES,
-    connect_sleep=DEFAULT_CONNECT_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
+    connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+    reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+    next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
+    before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
 ):
     """
     Fetch measurements from a list of Airthings device serial numbers.
@@ -271,43 +305,51 @@ def fetch_measurements_from_serial_numbers(
 
     return fetch_measurements(
         serial_numbers,
+        scan_attempts,
         scan_timeout,
-        scan_retries,
-        scan_sleep,
-        connect_retries,
-        connect_sleep,
+        rescan_sleep,
+        connect_attempts,
+        reconnect_sleep,
+        next_connect_sleep,
+        before_fetch_sleep,
     )
 
 
 def fetch_measurements_from_serial_number(
     serial_number,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
-    connect_retries=DEFAULT_CONNECT_RETRIES,
-    connect_sleep=DEFAULT_CONNECT_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
+    connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+    reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+    next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
+    before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
 ):
     """
     Fetch measurements from a specific Airthings device serial number.
     """
     devices = fetch_measurements_from_serial_numbers(
         [serial_number],
+        scan_attempts,
         scan_timeout,
-        scan_retries,
-        scan_sleep,
-        connect_retries,
-        connect_sleep,
+        rescan_sleep,
+        connect_attempts,
+        reconnect_sleep,
+        next_connect_sleep,
+        before_fetch_sleep,
     )
     return devices[0] if devices else None
 
 
 def fetch_measurements_from_mac_addresses(
     mac_addresses,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
-    connect_retries=DEFAULT_CONNECT_RETRIES,
-    connect_sleep=DEFAULT_CONNECT_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
+    connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+    reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+    next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
+    before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
 ):
     """
     Fetch measurements from a list of Airthings device MAC addresses.
@@ -315,31 +357,37 @@ def fetch_measurements_from_mac_addresses(
 
     return fetch_measurements(
         mac_addresses,
+        scan_attempts,
         scan_timeout,
-        scan_retries,
-        scan_sleep,
-        connect_retries,
-        connect_sleep,
+        rescan_sleep,
+        connect_attempts,
+        reconnect_sleep,
+        next_connect_sleep,
+        before_fetch_sleep,
     )
 
 
 def fetch_measurements_from_mac_address(
     mac_address,
+    scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
-    scan_retries=DEFAULT_SCAN_RETRIES,
-    scan_sleep=DEFAULT_SCAN_SLEEP,
-    connect_retries=DEFAULT_CONNECT_RETRIES,
-    connect_sleep=DEFAULT_CONNECT_SLEEP,
+    rescan_sleep=DEFAULT_RESCAN_SLEEP,
+    connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+    reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+    next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
+    before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
 ):
     """
     Fetch measurements from a specific Airthings device MAC address.
     """
     devices = fetch_measurements(
         [mac_address],
+        scan_attempts,
         scan_timeout,
-        scan_retries,
-        scan_retries,
-        connect_retries,
-        connect_sleep,
+        rescan_sleep,
+        connect_attempts,
+        reconnect_sleep,
+        next_connect_sleep,
+        before_fetch_sleep,
     )
     return devices[0] if devices else None

@@ -5,8 +5,8 @@ import time
 import bluepy.btle as btle
 
 from .constants import (
-    DEFAULT_CONNECT_RETRIES,
-    DEFAULT_CONNECT_SLEEP,
+    DEFAULT_CONNECT_ATTEMPTS,
+    DEFAULT_RECONNECT_SLEEP,
     DEVICE_MODEL_NUMBER_LENGTH,
     SENSOR_ATMOSPHERIC_PRESSURE_KEY,
     SENSOR_CO2_KEY,
@@ -16,7 +16,7 @@ from .constants import (
     SENSOR_TEMPERATURE_KEY,
     SENSOR_VOC_KEY,
 )
-from .exceptions import OutOfConnectRetriesException
+from .exceptions import OutOfConnectAttemptsException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -69,8 +69,8 @@ class Device:
         mac_address,
         serial_number,
         peripheral=None,
-        connect_retries=DEFAULT_CONNECT_RETRIES,
-        connect_sleep=DEFAULT_CONNECT_SLEEP,
+        connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+        reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
     ):
         self._mac_address = mac_address
         self._serial_number = serial_number
@@ -79,8 +79,8 @@ class Device:
         self._debug_information = None
         self._has_debug_information = False
         self._peripheral = peripheral
-        self._connect_retries = connect_retries
-        self._connect_sleep = connect_sleep
+        self._connect_attempts = connect_attempts
+        self._reconnect_sleep = reconnect_sleep
 
     def __repr__(self):
         return repr(
@@ -105,9 +105,9 @@ class Device:
                 self._peripheral = btle.Peripheral(self.mac_address)
                 break
             except btle.BTLEException as e:
-                if current_retries == self._connect_retries:
-                    raise OutOfConnectRetriesException(
-                        self._connect_retries, self._connect_sleep
+                if current_retries == self._connect_attempts:
+                    raise OutOfConnectAttemptsException(
+                        self._connect_attempts, self._reconnect_sleep
                     )
 
                 current_retries += 1
@@ -115,10 +115,10 @@ class Device:
                 _LOGGER.debug(e)
                 _LOGGER.debug(
                     "device._connect failed, retrying connect in %d seconds... Current retries = %d out of %d"
-                    % (self._connect_sleep, current_retries, self._connect_retries)
+                    % (self._reconnect_sleep, current_retries, self._connect_attempts)
                 )
 
-                time.sleep(self._connect_sleep)
+                time.sleep(self._reconnect_sleep)
 
     def _disconnect(self):
         self._peripheral.disconnect()
@@ -149,13 +149,13 @@ class Device:
 
     def fetch_and_set_measurements(
         self,
-        connect_retries=DEFAULT_CONNECT_RETRIES,
-        connect_sleep=DEFAULT_CONNECT_SLEEP,
+        connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
+        reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
     ):
         _LOGGER.debug("Fetching measurements from device:")
         _LOGGER.debug(self)
-        self._connect_retries = connect_retries
-        self._connect_sleep = connect_sleep
+        self._connect_attempts = connect_attempts
+        self._reconnect_sleep = reconnect_sleep
         self._connect()
         raw_data = self._fetch_raw_data()
         data = self._parse_raw_data(raw_data)

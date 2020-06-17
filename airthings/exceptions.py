@@ -5,17 +5,25 @@ class AirthingsModelNotImplementedException(Exception):
         )
 
 
-class OutOfScanRetriesException(Exception):
-    def __init__(self, scan_timeout, scan_retries, scan_sleep):
-        super(OutOfScanRetriesException, self).__init__(
-            "Out of scan retries, try raising the scan_retries value (currently: %d), the scan_timeout value (currently: %d), or the scan_sleep value (currently: %d)"
-            % (scan_retries, scan_timeout, scan_sleep)
+class OutOfScanAttemptsException(Exception):
+    def __init__(self, scan_attempts, scan_timeout, rescan_sleep):
+        super(OutOfScanAttemptsException, self).__init__(
+            "Out of scan attempts, try raising the scan_attempts value (currently: %d times), scan_timeout value (currently: %d seconds), or the rescan_sleep value (currently: %d seconds)"
+            % (scan_attempts, scan_timeout, rescan_sleep)
         )
 
 
-class OutOfConnectRetriesException(Exception):
-    def __init__(self, connect_retries, connect_sleep):
-        super(OutOfConnectRetriesException, self).__init__(
-            "Out of connect retries, try raising the connect_retries value (currently: %d) or the connect_sleep value (currently: %d)"
-            % (connect_retries, connect_sleep)
+class OutOfConnectAttemptsException(Exception):
+    def __init__(self, connect_attempts, reconnect_sleep, next_connect_sleep=None):
+        super(OutOfConnectAttemptsException, self).__init__(
+            (
+                "Out out connect attempts, try raising the connect_attempts value (currently: %d times), the reconnect_sleep value (currently: %d seconds)"
+                % (connect_attempts, reconnect_sleep)
+            )
+            + (
+                ""
+                if not next_connect_sleep
+                else " or the next_connect_sleep value (currently: %d seconds)"
+                % next_connect_sleep
+            )
         )
