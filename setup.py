@@ -10,7 +10,7 @@ except ImportError:
 
 setuptools.setup(
     name="airthings",
-    version="2.1.1",
+    version="2.1.2",
     author="Marius Kotlarz",
     author_email="marius@kotlarz.no",
     description="Fetch sensor measurements from Airthings devices",
