@@ -15,7 +15,8 @@ _Note: Some features are currently undocumented, and parts are untested/not yet 
 
 ## Requirements
 
-The package has currently only been tested on Linux with the `Wave Plus Gen 1 (2930)`, other operating systems and device models should in theory work fine, but is untested.
+`bluepy` only supports Linux, and is therefore currently the only supported operating system.
+I have only tested with the `Wave Plus Gen 1 (2930)`. Other device models should in theory work fine, but they are untested or might be unimplemented.
 
 ### System requirements:
 

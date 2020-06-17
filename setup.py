@@ -20,11 +20,11 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=["bluepy==1.3.0"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Information Technology",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: POSIX :: Linux",
         "Topic :: Home Automation",
         "Topic :: Utilities",
     ],
