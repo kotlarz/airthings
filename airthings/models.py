@@ -74,6 +74,7 @@ class Device:
     ):
         self._mac_address = mac_address
         self._serial_number = serial_number
+        self._identifier = serial_number[4:]
         self._measurements = {}
         self._has_measurements = False
         self._debug_information = None
@@ -202,7 +203,7 @@ class Device:
 
     @property
     def identifier(self):
-        return self.model_number + self.serial_number
+        return self._identifier
 
     @property
     def mac_address(self):

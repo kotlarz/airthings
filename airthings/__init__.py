@@ -16,7 +16,11 @@ from .constants import (
 )
 from .exceptions import OutOfConnectAttemptsException, OutOfScanAttemptsException
 from .models import Device
-from .utils import determine_device_model, determine_device_model_from_mac_address
+from .utils import (
+    determine_device,
+    determine_device_class_from_serial_number,
+    determine_device_from_mac_address,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +60,7 @@ def discover_devices(
             scanner = btle.Scanner()
             devices = scanner.scan(scan_timeout)
             for dev in devices:
-                device = determine_device_model(dev)
+                device = determine_device(dev)
                 if device:
                     if mac_addresses and device.mac_address not in mac_addresses:
                         # MAC addresses are set, and the device MAC address does not
@@ -250,7 +254,7 @@ def fetch_measurements(
             current_retries = 0
             while True:
                 try:
-                    device = determine_device_model_from_mac_address(mac_address)
+                    device = determine_device_from_mac_address(mac_address)
                 except btle.BTLEDisconnectError as e:
                     if current_retries == connect_attempts:
                         raise OutOfConnectAttemptsException(
@@ -261,15 +265,26 @@ def fetch_measurements(
 
                     _LOGGER.debug(e)
                     _LOGGER.debug(
-                        "determine_device_model_from_mac_addres failed, retrying connect in %d seconds... Current retries = %d out of %d"
+                        "determine_device_from_mac_address failed, retrying connect in %d seconds... Current retries = %d out of %d"
                         % (reconnect_sleep, current_retries, connect_attempts)
                     )
 
                     time.sleep(reconnect_sleep)
 
             airthings_devices.append(device)
-
     else:
+        if serial_numbers:
+            # Check if serial numbers are valid Airthings serial numbers
+            _LOGGER.debug(
+                "Serial numbers are set, checking if they are Airthings serial numbers"
+            )
+            for serial_number in serial_numbers:
+                device_class = determine_device_class_from_serial_number(serial_number)
+                _LOGGER.debug(
+                    "Matched serial number %s with Airthings device: %s"
+                    % (serial_number, device_class.LABEL)
+                )
+
         # Discover the devices automatically
         _LOGGER.debug(
             "MAC addresses are not set, automatically discovering nearby Airthings devices"
@@ -279,7 +294,7 @@ def fetch_measurements(
         )
 
     _LOGGER.debug(
-        "Sleeping %d seconds before fetching measurements from devices"
+        "Sleeping %d seconds before fetching measurements from Airthings devices"
         % before_fetch_sleep
     )
     time.sleep(before_fetch_sleep)
