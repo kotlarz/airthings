@@ -24,7 +24,7 @@ I have only tested with the `Wave Plus Gen 1 (2930)`. Other device models should
 
 ## Installation
 
-The current stable version of infrastructure-daigrams is available on pypi and can be installed by running:
+The current stable version of airthings is available on pypi and can be installed by running:
 
 `pip install airthings`
 

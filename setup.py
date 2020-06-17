@@ -10,7 +10,7 @@ except ImportError:
 
 setuptools.setup(
     name="airthings",
-    version="2.1.3",
+    version="3.0.0",
     author="Marius Kotlarz",
     author_email="marius@kotlarz.no",
     description="Fetch sensor measurements from Airthings devices",
@@ -20,7 +20,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=["bluepy==1.3.0"],
     classifiers=[
-        "Development Status :: 4 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: Information Technology",
         "License :: OSI Approved :: MIT License",
