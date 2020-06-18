@@ -39,7 +39,7 @@ Examples can be found in the [examples](./examples) directory.
 
 ## Supported devices
 
-_Note: "Model number" are the first 4 digits of the Airthings device_
+_Note: "Model number" are the first 4 digits of the Airthings device serial number_
 
 ### Wave Gen 1 (Model number: 2900)
 
