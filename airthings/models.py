@@ -274,12 +274,26 @@ class Device:
 
         try:
             return self._peripheral.getState() != "disc"
-        except btle.BTLEException as e:
+        except IOError as e:
             _LOGGER.warning(
-                "Could not check if device is connected, assuming it's not connected"
+                "IOError no {} whilst checking if the device is connected, assuming it's not connected".format(
+                    e.errno
+                )
             )
             _LOGGER.debug(e)
-            return False
+        except btle.BTLEException as e:
+            _LOGGER.warning(
+                "BTLE exception whilst checking if the device is connected, assuming it's not connected"
+            )
+            _LOGGER.debug(e)
+
+        except Exception as e:
+            _LOGGER.warning(
+                "Generic exception whilst checking if the device is connected, assuming it's not connected"
+            )
+            _LOGGER.debug(e)
+
+        return False
 
     @property
     def connection(self):
