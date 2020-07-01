@@ -4,9 +4,120 @@ import struct
 import bluepy.btle as btle
 
 from .devices import DEVICE_MODELS
-from .exceptions import AirthingsModelNotImplementedException
+from .exceptions import (
+    AirthingsModelNotImplementedException,
+    CouldNotDetermineAlarmSeverityException,
+)
+from .constants import (
+    ALARM_SEVERITY_UNKNOWN,
+    ALARM_SEVERITY_UNKNOWN,
+    ALARM_OPERATOR_EQUAL,
+    ALARM_OPERATOR_NOT_EQUAL,
+    ALARM_OPERATOR_GREATER_THAN,
+    ALARM_OPERATOR_LESS_THAN,
+    ALARM_OPERATOR_GREATER_THAN_OR_EQUAL,
+    ALARM_OPERATOR_LESS_THAN_OR_EQUAL,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def determine_alarm_severity(alarm_rules, value):
+    from .models import Alarm
+
+    if alarm_rules is None:
+        # TODO: exception?
+        return None
+
+    print("=" * 32)
+    print("ALARM RULES:", alarm_rules)
+
+    for alarm_rule in alarm_rules:
+        print("*" * 48)
+        severity = alarm_rule["severity"]
+        rules = alarm_rule["rules"]
+        required_matches = len(rules)
+
+        print(severity, rules)
+
+        matches = 0
+        for rule in rules:
+            matched_rule = None
+            rule_operator = rule["operator"]
+            rule_value = rule["value"]
+            print(value, rule_operator, rule_value)
+            if rule_operator == ALARM_OPERATOR_EQUAL:
+                if value == rule_value:
+                    matched_rule = rule
+            elif rule_operator == ALARM_OPERATOR_NOT_EQUAL:
+                if value != rule_value:
+                    matched_rule = rule
+            elif rule_operator == ALARM_OPERATOR_GREATER_THAN:
+                if value > rule_value:
+                    matched_rule = rule
+            elif rule_operator == ALARM_OPERATOR_LESS_THAN:
+                if value > rule_value:
+                    matched_rule = rule
+            elif rule_operator == ALARM_OPERATOR_GREATER_THAN_OR_EQUAL:
+                if value >= rule_value:
+                    matched_rule = rule
+            elif rule_operator == ALARM_OPERATOR_LESS_THAN_OR_EQUAL:
+                if value <= rule_value:
+                    matched_rule = rule
+
+            if matched_rule:
+                matches += 1
+
+            print("MATCHES", matches, required_matches)
+
+        if matches == required_matches:
+            return Alarm(severity=severity, value=value, rules=rules)
+    else:
+        # TODO:?
+        """
+        if matched_rule is None:
+            raise CouldNotDetermineAlarmSeverityException(severity, value, rules)
+
+        """
+        _LOGGER.warning(
+            "Setting severity to unknown. Could not determine alarm severity for value: {}, and alarm_rules: {}".format(
+                value, alarm_rules
+            )
+        )
+        return Alarm(severity=ALARM_SEVERITY_UNKNOWN, value=value)
+
+
+"""
+
+    {
+        "severity": ALARM_SEVERITY_HIGH,
+        "rules": [{ALARM_RULE_GREATER_THAN_OR_EQUAL: 70,}],
+    },
+    {
+        "severity": ALARM_SEVERITY_MEDIUM,
+        "rules": [{ALARM_RULE_GREATER_THAN_OR_EQUAL: 60,}, {ALARM_RULE_LESS_THAN: 70,}],
+    },
+
+# Alarm rules
+ALARM_RULE_EQUAL = "equal"
+ALARM_RULE_NOT_EQUAL = "not_equal"
+ALARM_RULE_GREATER_THAN = "greater_than"
+ALARM_RULE_LESS_THAN = "less_than"
+ALARM_RULE_GREATER_THAN_OR_EQUAL = "greater_than_or_equal"
+ALARM_RULE_LESS_THAN_OR_EQUAL = "less_than_or_equal"
+
+    # Alarm severity levels
+    ALARM_SEVERITY_HIGH = "high"
+    ALARM_SEVERITY_HIGH_COLOR = "red"
+    ALARM_SEVERITY_MEDIUM = "medium"
+    ALARM_SEVERITY_MEDIUM_COLOR = "orange"
+    ALARM_SEVERITY_LOW = "low"
+    ALARM_SEVERITY_LOW_COLOR = "yellow"
+    ALARM_SEVERITY_CAUTION = "low"
+    ALARM_SEVERITY_CAUTION_COLOR = "blue"
+    ALARM_SEVERITY_NONE = "none"
+    ALARM_SEVERITY_NONE_COLOR = None
+"""
 
 
 def fetch_characteristic(peripheral, uuid):

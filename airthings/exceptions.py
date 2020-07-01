@@ -5,6 +5,15 @@ class AirthingsModelNotImplementedException(Exception):
         )
 
 
+class CouldNotDetermineAlarmSeverityException(Exception):
+    def __init__(self, severity, value, rules):
+        super(CouldNotDetermineAlarmSeverityException, self).__init__(
+            "Could not determine severity: {}, with value: {}, and rules: {}. It's most likely not implemented".format(
+                severity, value, rules
+            )
+        )
+
+
 class OutOfScanAttemptsException(Exception):
     def __init__(self, scan_attempts, scan_timeout, rescan_sleep):
         super(OutOfScanAttemptsException, self).__init__(

@@ -15,19 +15,74 @@ from .constants import (
     SENSOR_RADON_SHORT_TERM_AVG_KEY,
     SENSOR_TEMPERATURE_KEY,
     SENSOR_VOC_KEY,
+    ALARM_SEVERITY_MAPPING,
+    ALARM_SEVERITY_NONE,
+    ALARM_SEVERITY_UNKNOWN,
+    ALARM_SEVERITY_UNKNOWN_LABEL,
+    ALARM_SEVERITY_UNKNOWN_COLOR,
 )
 from .exceptions import OutOfConnectAttemptsException
 
 _LOGGER = logging.getLogger(__name__)
 
 
+class Alarm:
+    def __init__(self, severity, value, rules=None):
+        self._severity = severity
+        self._value = value
+        self._rules = rules
+
+        # Match the severity mapping and set color/label
+        for alarm_severity, alarm_info in ALARM_SEVERITY_MAPPING.items():
+            if alarm_severity == severity:
+                self._label = alarm_info["label"]
+                self._color = alarm_info["color"]
+                break
+        else:
+            # TODO: raise exception?
+            self._severity = ALARM_SEVERITY_UNKNOWN
+            self._label = ALARM_SEVERITY_UNKNOWN_LABEL
+            self._color = ALARM_SEVERITY_UNKNOWN_COLOR
+
+    def __repr__(self):
+        return repr("{} Alarm with value {}".format(self._label, self._value,))
+
+    @property
+    def severity(self):
+        return self._severity
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def rules(self):
+        return self._rules
+
+    @property
+    def label(self):
+        return self._label
+
+    @property
+    def color(self):
+        return self._color
+
+    @property
+    def is_important(self):
+        return self.severity != ALARM_SEVERITY_NONE
+
+
 class Sensor:
     KEY = None
     LABEL = None
     UNIT = None
+    ALARM_RULES = None
 
     def __init__(self, value):
+        from .utils import determine_alarm_severity
+
         self._value = value
+        self._current_alarm = determine_alarm_severity(self.ALARM_RULES, value)
 
     def __repr__(self):
         return repr("{} {}".format(self._value, self.unit))
@@ -43,6 +98,22 @@ class Sensor:
     @property
     def unit(self):
         return self.UNIT
+
+    @property
+    def has_alarm_rules(self):
+        return self.ALARM_RULES is not None
+
+    @property
+    def alarm_rules(self):
+        return self.ALARM_RULES
+
+    @property
+    def has_alarm(self):
+        return self._current_alarm is not None
+
+    @property
+    def current_alarm(self):
+        return self._current_alarm
 
     @property
     def value(self):
@@ -165,6 +236,26 @@ class Device:
         # TODO: check sensor version
         self._parse_data(data)
         self._has_measurements = True
+
+        # Check for alarms
+        print("HELLO")
+        print(self.measurements)
+        for measurement, sensor in self.measurements.items():
+            print(measurement)
+            print(sensor.alarm_rules)
+            print(sensor.current_alarm)
+            if not sensor.has_alarm_rules:
+                _LOGGER.debug(
+                    "Sensor {} does not have alarm rules, skipping".format(sensor)
+                )
+                continue
+            elif not sensor.has_alarm:
+                # No alarm triggering
+                continue
+
+            print("ALARM!")
+            print(sensor)
+
         _LOGGER.debug("Fetched measurements!")
         _LOGGER.debug(self._measurements)
 
