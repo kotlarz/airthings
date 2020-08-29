@@ -178,7 +178,7 @@ class Device:
 
                 self._peripheral = btle.Peripheral(self.mac_address, iface=self._iface)
                 break
-            except btle.BTLEErrorException as e:
+            except btle.BTLEException as e:
                 if current_retries == self._connect_attempts:
                     raise OutOfConnectAttemptsException(
                         self._connect_attempts, self._reconnect_sleep
