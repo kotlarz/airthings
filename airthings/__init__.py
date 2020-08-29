@@ -182,7 +182,11 @@ def fetch_measurements_from_devices(
         current_retries = 0
         while True:
             try:
-                device.fetch_and_set_measurements(connect_attempts, iface)
+                device.fetch_and_set_measurements(
+                    connect_attempts=connect_attempts,
+                    reconnect_sleep=reconnect_sleep,
+                    iface=iface
+                )
                 break
             except btle.BTLEDisconnectError as e:
                 if current_retries == connect_attempts:
