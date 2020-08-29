@@ -30,23 +30,16 @@ def determine_alarm_severity(alarm_rules, value):
         # TODO: exception?
         return None
 
-    print("=" * 32)
-    print("ALARM RULES:", alarm_rules)
-
     for alarm_rule in alarm_rules:
-        print("*" * 48)
         severity = alarm_rule["severity"]
         rules = alarm_rule["rules"]
         required_matches = len(rules)
-
-        print(severity, rules)
 
         matches = 0
         for rule in rules:
             matched_rule = None
             rule_operator = rule["operator"]
             rule_value = rule["value"]
-            print(value, rule_operator, rule_value)
             if rule_operator == ALARM_OPERATOR_EQUAL:
                 if value == rule_value:
                     matched_rule = rule
@@ -57,7 +50,7 @@ def determine_alarm_severity(alarm_rules, value):
                 if value > rule_value:
                     matched_rule = rule
             elif rule_operator == ALARM_OPERATOR_LESS_THAN:
-                if value > rule_value:
+                if value < rule_value:
                     matched_rule = rule
             elif rule_operator == ALARM_OPERATOR_GREATER_THAN_OR_EQUAL:
                 if value >= rule_value:
@@ -69,9 +62,7 @@ def determine_alarm_severity(alarm_rules, value):
             if matched_rule:
                 matches += 1
 
-            print("MATCHES", matches, required_matches)
-
-        if matches == required_matches:
+        if matches >= required_matches:
             return Alarm(severity=severity, value=value, rules=rules)
     else:
         # TODO:?

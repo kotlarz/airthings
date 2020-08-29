@@ -110,7 +110,7 @@ class Sensor:
 
     @property
     def has_alarm(self):
-        return self._current_alarm is not None
+        return self._current_alarm is not None and self._current_alarm.severity != ALARM_SEVERITY_NONE 
 
     @property
     def current_alarm(self):
@@ -241,23 +241,20 @@ class Device:
         self._has_measurements = True
 
         # Check for alarms
-        print("HELLO")
-        print(self.measurements)
         for measurement, sensor in self.measurements.items():
-            print(measurement)
-            print(sensor.alarm_rules)
-            print(sensor.current_alarm)
             if not sensor.has_alarm_rules:
                 _LOGGER.debug(
-                    "Sensor {} does not have alarm rules, skipping".format(sensor)
+                    "Sensor {} does not have alarm rules, skipping".format(sensor.label)
                 )
                 continue
             elif not sensor.has_alarm:
                 # No alarm triggering
+                _LOGGER.debug(
+                    "Sensor {} does not have any alarms triggering, skipping".format(sensor.label)
+                )
                 continue
 
-            print("ALARM!")
-            print(sensor)
+            _LOGGER.debug("Sensor {} has an alarm triggering: {}".format(sensor.label, sensor.current_alarm))
 
         _LOGGER.debug("Fetched measurements!")
         _LOGGER.debug(self._measurements)
