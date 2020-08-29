@@ -32,7 +32,7 @@ def discover_devices(
     scan_attempts=DEFAULT_SCAN_ATTEMPTS,
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
-    iface=DEFAULT_BLUETOOTH_INTERFACE
+    iface=DEFAULT_BLUETOOTH_INTERFACE,
 ):
     """
     Discover Airthings devices either automatically, by MAC addresses or by serial_number
@@ -120,7 +120,9 @@ def find_devices_by_mac_addresses(
     """
     Find Airthings devices by using a list of MAC addresses.
     """
-    return discover_devices(mac_addresses, scan_attempts, scan_timeout, rescan_sleep, iface)
+    return discover_devices(
+        mac_addresses, scan_attempts, scan_timeout, rescan_sleep, iface
+    )
 
 
 def find_device_by_mac_address(
@@ -149,7 +151,9 @@ def find_devices_by_serial_numbers(
     """
     Find Airthings devices by using a list of serial numbers (6 digits).
     """
-    return discover_devices(serial_numbers, scan_attempts, scan_timeout, rescan_sleep, iface)
+    return discover_devices(
+        serial_numbers, scan_attempts, scan_timeout, rescan_sleep, iface
+    )
 
 
 def find_device_by_serial_number(
@@ -185,7 +189,7 @@ def fetch_measurements_from_devices(
                 device.fetch_and_set_measurements(
                     connect_attempts=connect_attempts,
                     reconnect_sleep=reconnect_sleep,
-                    iface=iface
+                    iface=iface,
                 )
                 break
             except btle.BTLEDisconnectError as e:
@@ -241,7 +245,7 @@ def fetch_measurements(
             reconnect_sleep,
             next_connect_sleep,
             before_fetch_sleep,
-            iface
+            iface,
         )
     )
 
@@ -309,7 +313,12 @@ def fetch_measurements(
             "MAC addresses are not set, automatically discovering nearby Airthings devices"
         )
         airthings_devices = discover_devices(
-            mac_addresses, serial_numbers, scan_timeout, scan_attempts, rescan_sleep, iface
+            mac_addresses,
+            serial_numbers,
+            scan_timeout,
+            scan_attempts,
+            rescan_sleep,
+            iface,
         )
 
     _LOGGER.debug(
@@ -333,7 +342,7 @@ def fetch_measurements_from_serial_numbers(
     reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
     next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
     before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
-    iface=DEFAULT_BLUETOOTH_INTERFACE
+    iface=DEFAULT_BLUETOOTH_INTERFACE,
 ):
     """
     Fetch measurements from a list of Airthings device serial numbers.
@@ -404,6 +413,7 @@ def fetch_measurements_from_mac_addresses(
         reconnect_sleep,
         next_connect_sleep,
         before_fetch_sleep,
+        iface,
     )
 
 
@@ -416,6 +426,7 @@ def fetch_measurements_from_mac_address(
     reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
     next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
     before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
+    iface=DEFAULT_BLUETOOTH_INTERFACE,
 ):
     """
     Fetch measurements from a specific Airthings device MAC address.

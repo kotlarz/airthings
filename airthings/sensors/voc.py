@@ -1,8 +1,8 @@
 from airthings.constants import (
+    SENSOR_VOC_ALARM_RULES,
     SENSOR_VOC_KEY,
     SENSOR_VOC_LABEL,
     SENSOR_VOC_UNIT,
-    SENSOR_VOC_ALARM_RULES,
 )
 from airthings.models import Sensor
 

@@ -1,8 +1,8 @@
 from airthings.constants import (
+    SENSOR_CO2_ALARM_RULES,
     SENSOR_CO2_KEY,
     SENSOR_CO2_LABEL,
     SENSOR_CO2_UNIT,
-    SENSOR_CO2_ALARM_RULES,
 )
 from airthings.models import Sensor
 

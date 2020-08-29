@@ -3,21 +3,20 @@ import struct
 
 import bluepy.btle as btle
 
+from .constants import (
+    ALARM_OPERATOR_EQUAL,
+    ALARM_OPERATOR_GREATER_THAN,
+    ALARM_OPERATOR_GREATER_THAN_OR_EQUAL,
+    ALARM_OPERATOR_LESS_THAN,
+    ALARM_OPERATOR_LESS_THAN_OR_EQUAL,
+    ALARM_OPERATOR_NOT_EQUAL,
+    ALARM_SEVERITY_UNKNOWN,
+    DEFAULT_BLUETOOTH_INTERFACE,
+)
 from .devices import DEVICE_MODELS
 from .exceptions import (
     AirthingsModelNotImplementedException,
     CouldNotDetermineAlarmSeverityException,
-)
-from .constants import (
-    DEFAULT_BLUETOOTH_INTERFACE,
-    ALARM_SEVERITY_UNKNOWN,
-    ALARM_SEVERITY_UNKNOWN,
-    ALARM_OPERATOR_EQUAL,
-    ALARM_OPERATOR_NOT_EQUAL,
-    ALARM_OPERATOR_GREATER_THAN,
-    ALARM_OPERATOR_LESS_THAN,
-    ALARM_OPERATOR_GREATER_THAN_OR_EQUAL,
-    ALARM_OPERATOR_LESS_THAN_OR_EQUAL,
 )
 
 _LOGGER = logging.getLogger(__name__)

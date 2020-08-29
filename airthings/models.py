@@ -5,6 +5,11 @@ import time
 import bluepy.btle as btle
 
 from .constants import (
+    ALARM_SEVERITY_MAPPING,
+    ALARM_SEVERITY_NONE,
+    ALARM_SEVERITY_UNKNOWN,
+    ALARM_SEVERITY_UNKNOWN_COLOR,
+    ALARM_SEVERITY_UNKNOWN_LABEL,
     DEFAULT_BLUETOOTH_INTERFACE,
     DEFAULT_CONNECT_ATTEMPTS,
     DEFAULT_RECONNECT_SLEEP,
@@ -16,11 +21,6 @@ from .constants import (
     SENSOR_RADON_SHORT_TERM_AVG_KEY,
     SENSOR_TEMPERATURE_KEY,
     SENSOR_VOC_KEY,
-    ALARM_SEVERITY_MAPPING,
-    ALARM_SEVERITY_NONE,
-    ALARM_SEVERITY_UNKNOWN,
-    ALARM_SEVERITY_UNKNOWN_LABEL,
-    ALARM_SEVERITY_UNKNOWN_COLOR,
 )
 from .exceptions import OutOfConnectAttemptsException
 
@@ -46,7 +46,7 @@ class Alarm:
             self._color = ALARM_SEVERITY_UNKNOWN_COLOR
 
     def __repr__(self):
-        return repr("{} Alarm with value {}".format(self._label, self._value,))
+        return repr("{} Alarm with value {}".format(self._label, self._value))
 
     @property
     def severity(self):
@@ -110,7 +110,10 @@ class Sensor:
 
     @property
     def has_alarm(self):
-        return self._current_alarm is not None and self._current_alarm.severity != ALARM_SEVERITY_NONE 
+        return (
+            self._current_alarm is not None
+            and self._current_alarm.severity != ALARM_SEVERITY_NONE
+        )
 
     @property
     def current_alarm(self):
@@ -158,7 +161,7 @@ class Device:
     def __repr__(self):
         return repr(
             "<Device mac_address={} serial_number={} model_number={} model={}>".format(
-                self.mac_address, self.serial_number, self.model_number, self.LABEL,
+                self.mac_address, self.serial_number, self.model_number, self.LABEL
             )
         )
 
@@ -209,7 +212,7 @@ class Device:
             btle.AssignedNumbers.firmwareRevisionString
         )
         self._debug_information["hardware_revision"] = self._fetch_characteristic(
-            btle.AssignedNumbers.hardwareRevisionString,
+            btle.AssignedNumbers.hardwareRevisionString
         )
         self._disconnect()
 
@@ -226,7 +229,7 @@ class Device:
         self,
         connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
         reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
-        iface=DEFAULT_BLUETOOTH_INTERFACE
+        iface=DEFAULT_BLUETOOTH_INTERFACE,
     ):
         _LOGGER.debug("Fetching measurements from device:")
         _LOGGER.debug(self)
@@ -250,11 +253,17 @@ class Device:
             elif not sensor.has_alarm:
                 # No alarm triggering
                 _LOGGER.debug(
-                    "Sensor {} does not have any alarms triggering, skipping".format(sensor.label)
+                    "Sensor {} does not have any alarms triggering, skipping".format(
+                        sensor.label
+                    )
                 )
                 continue
 
-            _LOGGER.debug("Sensor {} has an alarm triggering: {}".format(sensor.label, sensor.current_alarm))
+            _LOGGER.debug(
+                "Sensor {} has an alarm triggering: {}".format(
+                    sensor.label, sensor.current_alarm
+                )
+            )
 
         _LOGGER.debug("Fetched measurements!")
         _LOGGER.debug(self._measurements)

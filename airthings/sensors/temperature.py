@@ -1,8 +1,8 @@
 from airthings.constants import (
+    SENSOR_TEMPERATURE_ALARM_RULES,
     SENSOR_TEMPERATURE_KEY,
     SENSOR_TEMPERATURE_LABEL,
     SENSOR_TEMPERATURE_UNIT,
-    SENSOR_TEMPERATURE_ALARM_RULES,
 )
 from airthings.models import Sensor
 

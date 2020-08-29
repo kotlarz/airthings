@@ -1,7 +1,7 @@
 # General
 DEVICE_MODEL_NUMBER_LENGTH = 4
 
-DEFAULT_BLUETOOTH_INTERFACE = 0 # 0 is hci0, 1 is hci1, etc.
+DEFAULT_BLUETOOTH_INTERFACE = 0  # 0 is hci0, 1 is hci1, etc.
 DEFAULT_BEFORE_FETCH_SLEEP = 3  # seconds
 
 # Connect
@@ -88,20 +88,20 @@ SENSOR_HUMIDITY_ALARM_RULES = [
     {
         "severity": ALARM_SEVERITY_NONE,
         "rules": [
-            {"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 30,},
-            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 60,},
+            {"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 30},
+            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 60},
         ],
     },
     {
         "severity": ALARM_SEVERITY_MEDIUM,
         "rules": [
-            {"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 25,},
-            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 30,},
+            {"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 25},
+            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 30},
         ],
     },
     {
         "severity": ALARM_SEVERITY_HIGH,
-        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 25,}],
+        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 25}],
     },
 ]
 ## Radon
@@ -109,18 +109,18 @@ SENSOR_RADON_UNIT = "Bq/m3"
 SENSOR_RADON_ALARM_RULES = [
     {
         "severity": ALARM_SEVERITY_HIGH,
-        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 150,}],
+        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 150}],
     },
     {
         "severity": ALARM_SEVERITY_MEDIUM,
         "rules": [
-            {"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 100,},
-            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 150,},
+            {"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 100},
+            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 150},
         ],
     },
     {
         "severity": ALARM_SEVERITY_NONE,
-        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 100,}],
+        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 100}],
     },
 ]
 
@@ -139,18 +139,18 @@ SENSOR_TEMPERATURE_UNIT = "°C"
 SENSOR_TEMPERATURE_ALARM_RULES = [
     {
         "severity": ALARM_SEVERITY_HIGH,
-        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 25,}],
+        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 25}],
     },
     {
         "severity": ALARM_SEVERITY_NONE,
         "rules": [
-            {"operator": ALARM_OPERATOR_GREATER_THAN, "value": 18,},
-            {"operator": ALARM_OPERATOR_LESS_THAN_OR_EQUAL, "value": 25,},
+            {"operator": ALARM_OPERATOR_GREATER_THAN, "value": 18},
+            {"operator": ALARM_OPERATOR_LESS_THAN_OR_EQUAL, "value": 25},
         ],
     },
     {
         "severity": ALARM_SEVERITY_CAUTION,
-        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 18,}],
+        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 18}],
     },
 ]
 
@@ -166,18 +166,18 @@ SENSOR_CO2_UNIT = "ppm"
 SENSOR_CO2_ALARM_RULES = [
     {
         "severity": ALARM_SEVERITY_HIGH,
-        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 1000,}],
+        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 1000}],
     },
     {
         "severity": ALARM_SEVERITY_MEDIUM,
         "rules": [
-            {"operator": ALARM_OPERATOR_GREATER_THAN, "value": 800,},
-            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 1000,},
+            {"operator": ALARM_OPERATOR_GREATER_THAN, "value": 800},
+            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 1000},
         ],
     },
     {
         "severity": ALARM_SEVERITY_NONE,
-        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 800,}],
+        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 800}],
     },
 ]
 
@@ -188,18 +188,18 @@ SENSOR_VOC_UNIT = "ppb"
 SENSOR_VOC_ALARM_RULES = [
     {
         "severity": ALARM_SEVERITY_HIGH,
-        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 2000,}],
+        "rules": [{"operator": ALARM_OPERATOR_GREATER_THAN_OR_EQUAL, "value": 2000}],
     },
     {
         "severity": ALARM_SEVERITY_MEDIUM,
         "rules": [
-            {"operator": ALARM_OPERATOR_GREATER_THAN, "value": 250,},
-            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 2000,},
+            {"operator": ALARM_OPERATOR_GREATER_THAN, "value": 250},
+            {"operator": ALARM_OPERATOR_LESS_THAN, "value": 2000},
         ],
     },
     {
         "severity": ALARM_SEVERITY_NONE,
-        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 250,}],
+        "rules": [{"operator": ALARM_OPERATOR_LESS_THAN, "value": 250}],
     },
 ]
 

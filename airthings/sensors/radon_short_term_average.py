@@ -1,8 +1,8 @@
 from airthings.constants import (
+    SENSOR_RADON_ALARM_RULES,
     SENSOR_RADON_SHORT_TERM_AVG_KEY,
     SENSOR_RADON_SHORT_TERM_AVG_LABEL,
     SENSOR_RADON_UNIT,
-    SENSOR_RADON_ALARM_RULES,
 )
 from airthings.models import Sensor
 
