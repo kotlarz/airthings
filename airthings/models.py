@@ -228,7 +228,7 @@ class Device:
         reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
         iface=DEFAULT_BLUETOOTH_INTERFACE
     ):
-        LOGGER.debug("Fetching measurements from device:")
+        _LOGGER.debug("Fetching measurements from device:")
         _LOGGER.debug(self)
         self._connect_attempts = connect_attempts
         self._reconnect_sleep = reconnect_sleep

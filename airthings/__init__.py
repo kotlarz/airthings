@@ -34,7 +34,6 @@ def discover_devices(
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE
 ):
-):
     """
     Discover Airthings devices either automatically, by MAC addresses or by serial_number
     """
@@ -331,7 +330,6 @@ def fetch_measurements_from_serial_numbers(
     next_connect_sleep=DEFAULT_NEXT_CONNECT_SLEEP,
     before_fetch_sleep=DEFAULT_BEFORE_FETCH_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE
-):
 ):
     """
     Fetch measurements from a list of Airthings device serial numbers.
