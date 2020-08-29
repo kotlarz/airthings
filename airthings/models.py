@@ -5,6 +5,7 @@ import time
 import bluepy.btle as btle
 
 from .constants import (
+    DEFAULT_BLUETOOTH_INTERFACE,
     DEFAULT_CONNECT_ATTEMPTS,
     DEFAULT_RECONNECT_SLEEP,
     DEVICE_MODEL_NUMBER_LENGTH,
@@ -175,9 +176,9 @@ class Device:
                         _LOGGER.warning("Failed to disconnect from Peripheral")
                         _LOGGER.debug(e)
 
-                self._peripheral = btle.Peripheral(self.mac_address)
+                self._peripheral = btle.Peripheral(self.mac_address, iface=self._iface)
                 break
-            except btle.BTLEException as e:
+            except btle.BTLEErrorException as e:
                 if current_retries == self._connect_attempts:
                     raise OutOfConnectAttemptsException(
                         self._connect_attempts, self._reconnect_sleep
@@ -225,11 +226,13 @@ class Device:
         self,
         connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
         reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+        iface=DEFAULT_BLUETOOTH_INTERFACE
     ):
-        _LOGGER.debug("Fetching measurements from device:")
+        LOGGER.debug("Fetching measurements from device:")
         _LOGGER.debug(self)
         self._connect_attempts = connect_attempts
         self._reconnect_sleep = reconnect_sleep
+        self._iface = iface
         self._connect()
         raw_data = self._fetch_raw_data()
         data = self._parse_raw_data(raw_data)

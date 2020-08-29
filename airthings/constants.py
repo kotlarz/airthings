@@ -1,6 +1,7 @@
 # General
 DEVICE_MODEL_NUMBER_LENGTH = 4
 
+DEFAULT_BLUETOOTH_INTERFACE = 0 # 0 is hci0, 1 is hci1, etc.
 DEFAULT_BEFORE_FETCH_SLEEP = 3  # seconds
 
 # Connect
