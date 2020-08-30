@@ -126,7 +126,12 @@ def find_devices_by_mac_addresses(
     Find Airthings devices by using a list of MAC addresses.
     """
     return discover_devices(
-        mac_addresses, scan_attempts, scan_timeout, rescan_sleep, iface
+        mac_addresses=mac_addresses,
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        iface=iface,
+        address_type=address_type,
     )
 
 
@@ -142,7 +147,12 @@ def find_device_by_mac_address(
     Find a single Airthings device by searching for a MAC address.
     """
     devices = find_devices_by_mac_addresses(
-        [mac_address], scan_attempts, scan_timeout, rescan_sleep, iface
+        mac_addresses=[mac_address],
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        iface=iface,
+        address_type=address_type,
     )
     return devices[0] if devices else None
 
@@ -153,13 +163,16 @@ def find_devices_by_serial_numbers(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
-    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Find Airthings devices by using a list of serial numbers (6 digits).
     """
     return discover_devices(
-        serial_numbers, scan_attempts, scan_timeout, rescan_sleep, iface
+        serial_numbers=serial_numbers,
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        iface=iface,
     )
 
 
@@ -169,13 +182,16 @@ def find_device_by_serial_number(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
-    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Find a single Airthings device by using a serial number (6 digits).
     """
     devices = find_devices_by_serial_numbers(
-        [serial_number], scan_attempts, scan_timeout, rescan_sleep, iface
+        serial_numbers=[serial_number],
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        iface=iface,
     )
     return devices[0] if devices else None
 
@@ -201,6 +217,9 @@ def fetch_measurements_from_devices(
                     connect_attempts=connect_attempts,
                     reconnect_sleep=reconnect_sleep,
                     iface=iface,
+                    fetch_attempts=fetch_attempts,
+                    refetch_sleep=refetch_sleep,
+                    address_type=address_type,
                 )
                 break
             except btle.BTLEDisconnectError as e:
@@ -251,7 +270,7 @@ def fetch_measurements(
 
     _LOGGER.debug("Starting to fetch measurements from Airthings devices")
     _LOGGER.debug(
-        "Scan attempts = {} times, Scan timeout = {} seconds, Rescan sleep = {} seconds, Connect attempts = {} times, Reconnect sleep = {} seconds, Next connect sleep = {} seconds, Before fetch sleep = {} seconds. iface = {}, Fetch attempts = {} times, Refetch sleep = {} seconds".format(
+        "Scan attempts = {} times, Scan timeout = {} seconds, Rescan sleep = {} seconds, Connect attempts = {} times, Reconnect sleep = {} seconds, Next connect sleep = {} seconds, Before fetch sleep = {} seconds. iface = {}, Fetch attempts = {} times, Refetch sleep = {} seconds, Address type = {}".format(
             scan_attempts,
             scan_timeout,
             rescan_sleep,
@@ -262,6 +281,7 @@ def fetch_measurements(
             iface,
             fetch_attempts,
             refetch_sleep,
+            address_type,
         )
     )
 
@@ -304,7 +324,9 @@ def fetch_measurements(
             current_retries = 0
             while True:
                 try:
-                    device = determine_device_from_mac_address(mac_address, iface)
+                    device = determine_device_from_mac_address(
+                        mac_address, iface=iface, address_type=address_type
+                    )
                 except btle.BTLEDisconnectError as e:
                     if current_retries == connect_attempts:
                         raise OutOfConnectAttemptsException(
@@ -329,12 +351,13 @@ def fetch_measurements(
             "MAC addresses are not set, automatically discovering nearby Airthings devices"
         )
         airthings_devices = discover_devices(
-            mac_addresses,
-            serial_numbers,
-            scan_timeout,
-            scan_attempts,
-            rescan_sleep,
-            iface,
+            mac_addresses=mac_addresses,
+            serial_numbers=serial_numbers,
+            scan_timeout=scan_timeout,
+            scan_attempts=scan_attempts,
+            rescan_sleep=rescan_sleep,
+            iface=iface,
+            address_type=address_type,
         )
 
     _LOGGER.debug(
@@ -345,12 +368,13 @@ def fetch_measurements(
     time.sleep(before_fetch_sleep)
 
     return fetch_measurements_from_devices(
-        airthings_devices,
-        connect_attempts,
-        reconnect_sleep,
-        iface,
-        fetch_attempts,
-        refetch_sleep,
+        devices=airthings_devices,
+        connect_attempts=connect_attempts,
+        reconnect_sleep=reconnect_sleep,
+        iface=iface,
+        fetch_attempts=fetch_attempts,
+        refetch_sleep=refetch_sleep,
+        address_type=address_type,
     )
 
 
@@ -373,17 +397,18 @@ def fetch_measurements_from_serial_numbers(
     """
 
     return fetch_measurements(
-        serial_numbers,
-        scan_attempts,
-        scan_timeout,
-        rescan_sleep,
-        connect_attempts,
-        reconnect_sleep,
-        next_connect_sleep,
-        before_fetch_sleep,
-        iface,
-        fetch_attempts,
-        refetch_sleep,
+        serial_numbers=serial_numbers,
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        connect_attempts=connect_attempts,
+        reconnect_sleep=reconnect_sleep,
+        next_connect_sleep=next_connect_sleep,
+        before_fetch_sleep=before_fetch_sleep,
+        iface=iface,
+        fetch_attempts=fetch_attempts,
+        refetch_sleep=refetch_sleep,
+        address_type=address_type,
     )
 
 
@@ -405,17 +430,18 @@ def fetch_measurements_from_serial_number(
     Fetch measurements from a specific Airthings device serial number.
     """
     devices = fetch_measurements_from_serial_numbers(
-        [serial_number],
-        scan_attempts,
-        scan_timeout,
-        rescan_sleep,
-        connect_attempts,
-        reconnect_sleep,
-        next_connect_sleep,
-        before_fetch_sleep,
-        iface,
-        fetch_attempts,
-        refetch_sleep,
+        serial_numbers=[serial_number],
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        connect_attempts=connect_attempts,
+        reconnect_sleep=reconnect_sleep,
+        next_connect_sleep=next_connect_sleep,
+        before_fetch_sleep=before_fetch_sleep,
+        iface=iface,
+        fetch_attempts=fetch_attempts,
+        refetch_sleep=refetch_sleep,
+        address_type=address_type,
     )
     return devices[0] if devices else None
 
@@ -437,19 +463,19 @@ def fetch_measurements_from_mac_addresses(
     """
     Fetch measurements from a list of Airthings device MAC addresses.
     """
-
     return fetch_measurements(
-        mac_addresses,
-        scan_attempts,
-        scan_timeout,
-        rescan_sleep,
-        connect_attempts,
-        reconnect_sleep,
-        next_connect_sleep,
-        before_fetch_sleep,
-        iface,
-        fetch_attempts,
-        refetch_sleep,
+        mac_addresses=mac_addresses,
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        connect_attempts=connect_attempts,
+        reconnect_sleep=reconnect_sleep,
+        next_connect_sleep=next_connect_sleep,
+        before_fetch_sleep=before_fetch_sleep,
+        iface=iface,
+        fetch_attempts=fetch_attempts,
+        refetch_sleep=refetch_sleep,
+        address_type=address_type,
     )
 
 
@@ -471,16 +497,17 @@ def fetch_measurements_from_mac_address(
     Fetch measurements from a specific Airthings device MAC address.
     """
     devices = fetch_measurements(
-        [mac_address],
-        scan_attempts,
-        scan_timeout,
-        rescan_sleep,
-        connect_attempts,
-        reconnect_sleep,
-        next_connect_sleep,
-        before_fetch_sleep,
-        iface,
-        fetch_attempts,
-        refetch_sleep,
+        mac_addresses=[mac_address],
+        scan_attempts=scan_attempts,
+        scan_timeout=scan_timeout,
+        rescan_sleep=rescan_sleep,
+        connect_attempts=connect_attempts,
+        reconnect_sleep=reconnect_sleep,
+        next_connect_sleep=next_connect_sleep,
+        before_fetch_sleep=before_fetch_sleep,
+        iface=iface,
+        fetch_attempts=fetch_attempts,
+        refetch_sleep=refetch_sleep,
+        address_type=address_type,
     )
     return devices[0] if devices else None
