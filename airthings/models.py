@@ -12,7 +12,9 @@ from .constants import (
     ALARM_SEVERITY_UNKNOWN_LABEL,
     DEFAULT_BLUETOOTH_INTERFACE,
     DEFAULT_CONNECT_ATTEMPTS,
+    DEFAULT_FETCH_ATTEMPTS,
     DEFAULT_RECONNECT_SLEEP,
+    DEFAULT_REFETCH_SLEEP,
     DEVICE_MODEL_NUMBER_LENGTH,
     SENSOR_ATMOSPHERIC_PRESSURE_KEY,
     SENSOR_CO2_KEY,
@@ -22,7 +24,7 @@ from .constants import (
     SENSOR_TEMPERATURE_KEY,
     SENSOR_VOC_KEY,
 )
-from .exceptions import OutOfConnectAttemptsException
+from .exceptions import OutOfConnectAttemptsException, OutOfFetchAttemptsException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -202,10 +204,50 @@ class Device:
         self._peripheral.disconnect()
         self._peripheral = None
 
+    def _reconnect(self):
+        try:
+            self._disconnect()
+        except Exception as e:
+            _LOGGER.debug(e)
+            _LOGGER.debug(
+                "Failed to disconnect during device reconnect, ignoring and continuing..."
+            )
+
+        try:
+            self._connect()
+        except Exception as e:
+            _LOGGER.debug(e)
+            _LOGGER.debug("Failed to connect during device reconnect, ignoring...")
+
     def _fetch_characteristic(self, uuid):
         from .utils import fetch_characteristic
 
-        return fetch_characteristic(self.connection, uuid)
+        current_retries = 0
+        while True:
+            try:
+                return fetch_characteristic(self.connection, uuid)
+            except btle.BTLEException as e:
+                if current_retries == self._fetch_attempts:
+                    raise OutOfFetchAttemptsException(
+                        self._fetch_attempts, self._refetch_sleep
+                    )
+
+                current_retries += 1
+
+                _LOGGER.debug(e)
+                _LOGGER.debug(
+                    "device._fetch_characteristic(uuid={}) failed, retrying connect in {} seconds... Current retries = {} out of {}".format(
+                        uuid, self._refetch_sleep, current_retries, self._fetch_attempts
+                    )
+                )
+
+                if isinstance(e, btle.BTLEDisconnectError):
+                    _LOGGER.debug(
+                        "Exception is a disconnect error, attempting a hard reconnect"
+                    )
+                    self._reconnect()
+
+                time.sleep(self._refetch_sleep)
 
     def _fetch_and_set_debug_information(self):
         self._debug_information["firmware_revision"] = self._fetch_characteristic(
@@ -229,12 +271,16 @@ class Device:
         self,
         connect_attempts=DEFAULT_CONNECT_ATTEMPTS,
         reconnect_sleep=DEFAULT_RECONNECT_SLEEP,
+        fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
+        refetch_sleep=DEFAULT_REFETCH_SLEEP,
         iface=DEFAULT_BLUETOOTH_INTERFACE,
     ):
         _LOGGER.debug("Fetching measurements from device:")
         _LOGGER.debug(self)
         self._connect_attempts = connect_attempts
         self._reconnect_sleep = reconnect_sleep
+        self._fetch_attempts = fetch_attempts
+        self._refetch_sleep = refetch_sleep
         self._iface = iface
         self._connect()
         raw_data = self._fetch_raw_data()

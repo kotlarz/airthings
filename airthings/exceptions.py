@@ -39,3 +39,12 @@ class OutOfConnectAttemptsException(Exception):
                 )
             )
         )
+
+
+class OutOfFetchAttemptsException(Exception):
+    def __init__(self, fetch_attempts, refetch_sleep):
+        super(OutOfFetchAttemptsException, self).__init__(
+            "Out of fetch attempts, try raising the fetch_attempts value (currently: {} times), or the refetch_sleep value (currently: {} seconds)".format(
+                fetch_attempts, refetch_sleep
+            )
+        )
