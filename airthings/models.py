@@ -10,6 +10,7 @@ from .constants import (
     ALARM_SEVERITY_UNKNOWN,
     ALARM_SEVERITY_UNKNOWN_COLOR,
     ALARM_SEVERITY_UNKNOWN_LABEL,
+    DEFAULT_BLUETOOTH_ADDRESS_TYPE,
     DEFAULT_BLUETOOTH_INTERFACE,
     DEFAULT_CONNECT_ATTEMPTS,
     DEFAULT_FETCH_ATTEMPTS,
@@ -181,7 +182,9 @@ class Device:
                         _LOGGER.warning("Failed to disconnect from Peripheral")
                         _LOGGER.debug(e)
 
-                self._peripheral = btle.Peripheral(self.mac_address, iface=self._iface)
+                self._peripheral = btle.Peripheral(
+                    self.mac_address, iface=self._iface, addrType=self._address_type
+                )
                 break
             except btle.BTLEException as e:
                 if current_retries == self._connect_attempts:
@@ -191,6 +194,7 @@ class Device:
 
                 current_retries += 1
 
+                _LOGGER.debug(type(e))
                 _LOGGER.debug(e)
                 _LOGGER.debug(
                     "device._connect failed, retrying connect in {} seconds... Current retries = {} out of {}".format(
@@ -274,6 +278,7 @@ class Device:
         fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
         refetch_sleep=DEFAULT_REFETCH_SLEEP,
         iface=DEFAULT_BLUETOOTH_INTERFACE,
+        address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
     ):
         _LOGGER.debug("Fetching measurements from device:")
         _LOGGER.debug(self)
@@ -282,6 +287,7 @@ class Device:
         self._fetch_attempts = fetch_attempts
         self._refetch_sleep = refetch_sleep
         self._iface = iface
+        self._address_type = address_type
         self._connect()
         raw_data = self._fetch_raw_data()
         data = self._parse_raw_data(raw_data)

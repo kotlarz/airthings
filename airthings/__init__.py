@@ -7,6 +7,7 @@ import bluepy.btle as btle
 
 from .constants import (
     DEFAULT_BEFORE_FETCH_SLEEP,
+    DEFAULT_BLUETOOTH_ADDRESS_TYPE,
     DEFAULT_BLUETOOTH_INTERFACE,
     DEFAULT_CONNECT_ATTEMPTS,
     DEFAULT_FETCH_ATTEMPTS,
@@ -35,6 +36,7 @@ def discover_devices(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Discover Airthings devices either automatically, by MAC addresses or by serial_number
@@ -118,6 +120,7 @@ def find_devices_by_mac_addresses(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Find Airthings devices by using a list of MAC addresses.
@@ -133,6 +136,7 @@ def find_device_by_mac_address(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Find a single Airthings device by searching for a MAC address.
@@ -149,6 +153,7 @@ def find_devices_by_serial_numbers(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Find Airthings devices by using a list of serial numbers (6 digits).
@@ -164,6 +169,7 @@ def find_device_by_serial_number(
     scan_timeout=DEFAULT_SCAN_TIMEOUT,
     rescan_sleep=DEFAULT_RESCAN_SLEEP,
     iface=DEFAULT_BLUETOOTH_INTERFACE,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Find a single Airthings device by using a serial number (6 digits).
@@ -182,6 +188,7 @@ def fetch_measurements_from_devices(
     iface=DEFAULT_BLUETOOTH_INTERFACE,
     fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
     refetch_sleep=DEFAULT_REFETCH_SLEEP,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Fetch measurements from a list of Airthings devices.
@@ -236,6 +243,7 @@ def fetch_measurements(
     iface=DEFAULT_BLUETOOTH_INTERFACE,
     fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
     refetch_sleep=DEFAULT_REFETCH_SLEEP,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Fetch measurements from Airthings devices either automatically, by MAC addresses or by serial numbers
@@ -358,6 +366,7 @@ def fetch_measurements_from_serial_numbers(
     iface=DEFAULT_BLUETOOTH_INTERFACE,
     fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
     refetch_sleep=DEFAULT_REFETCH_SLEEP,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Fetch measurements from a list of Airthings device serial numbers.
@@ -390,6 +399,7 @@ def fetch_measurements_from_serial_number(
     iface=DEFAULT_BLUETOOTH_INTERFACE,
     fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
     refetch_sleep=DEFAULT_REFETCH_SLEEP,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Fetch measurements from a specific Airthings device serial number.
@@ -422,6 +432,7 @@ def fetch_measurements_from_mac_addresses(
     iface=DEFAULT_BLUETOOTH_INTERFACE,
     fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
     refetch_sleep=DEFAULT_REFETCH_SLEEP,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Fetch measurements from a list of Airthings device MAC addresses.
@@ -454,6 +465,7 @@ def fetch_measurements_from_mac_address(
     iface=DEFAULT_BLUETOOTH_INTERFACE,
     fetch_attempts=DEFAULT_FETCH_ATTEMPTS,
     refetch_sleep=DEFAULT_REFETCH_SLEEP,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
 ):
     """
     Fetch measurements from a specific Airthings device MAC address.

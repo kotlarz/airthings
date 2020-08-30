@@ -11,6 +11,7 @@ from .constants import (
     ALARM_OPERATOR_LESS_THAN_OR_EQUAL,
     ALARM_OPERATOR_NOT_EQUAL,
     ALARM_SEVERITY_UNKNOWN,
+    DEFAULT_BLUETOOTH_ADDRESS_TYPE,
     DEFAULT_BLUETOOTH_INTERFACE,
 )
 from .devices import DEVICE_MODELS
@@ -88,14 +89,18 @@ def fetch_characteristic(peripheral, uuid):
     return characteristic.read()
 
 
-def determine_device_from_mac_address(mac_address, iface=DEFAULT_BLUETOOTH_INTERFACE):
+def determine_device_from_mac_address(
+    mac_address,
+    iface=DEFAULT_BLUETOOTH_INTERFACE,
+    address_type=DEFAULT_BLUETOOTH_ADDRESS_TYPE,
+):
     _LOGGER.debug(
         "Attempting to determine device model class from MAC address: {}".format(
             mac_address
         )
     )
 
-    peripheral = btle.Peripheral(mac_address, iface)
+    peripheral = btle.Peripheral(mac_address, iface=iface, addrType=address_type)
     # First 4 digits of the serial number
     model_number = fetch_characteristic(
         peripheral, btle.AssignedNumbers.modelNumberString
