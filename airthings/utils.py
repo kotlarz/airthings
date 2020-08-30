@@ -78,39 +78,6 @@ def determine_alarm_severity(alarm_rules, value):
         return Alarm(severity=ALARM_SEVERITY_UNKNOWN, value=value)
 
 
-"""
-
-    {
-        "severity": ALARM_SEVERITY_HIGH,
-        "rules": [{ALARM_RULE_GREATER_THAN_OR_EQUAL: 70,}],
-    },
-    {
-        "severity": ALARM_SEVERITY_MEDIUM,
-        "rules": [{ALARM_RULE_GREATER_THAN_OR_EQUAL: 60,}, {ALARM_RULE_LESS_THAN: 70,}],
-    },
-
-# Alarm rules
-ALARM_RULE_EQUAL = "equal"
-ALARM_RULE_NOT_EQUAL = "not_equal"
-ALARM_RULE_GREATER_THAN = "greater_than"
-ALARM_RULE_LESS_THAN = "less_than"
-ALARM_RULE_GREATER_THAN_OR_EQUAL = "greater_than_or_equal"
-ALARM_RULE_LESS_THAN_OR_EQUAL = "less_than_or_equal"
-
-    # Alarm severity levels
-    ALARM_SEVERITY_HIGH = "high"
-    ALARM_SEVERITY_HIGH_COLOR = "red"
-    ALARM_SEVERITY_MEDIUM = "medium"
-    ALARM_SEVERITY_MEDIUM_COLOR = "orange"
-    ALARM_SEVERITY_LOW = "low"
-    ALARM_SEVERITY_LOW_COLOR = "yellow"
-    ALARM_SEVERITY_CAUTION = "low"
-    ALARM_SEVERITY_CAUTION_COLOR = "blue"
-    ALARM_SEVERITY_NONE = "none"
-    ALARM_SEVERITY_NONE_COLOR = None
-"""
-
-
 def fetch_characteristic(peripheral, uuid):
     if peripheral is None:
         raise ValueError("Peripheral cannot be None")
