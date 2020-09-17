@@ -16,6 +16,7 @@ setuptools.setup(
     description="Fetch sensor measurements from Airthings devices",
     long_description=read_md("README.md"),
     long_description_content_type="text/markdown",
+    license="MIT",
     url="https://github.com/kotlarz/airthings",
     packages=setuptools.find_packages(),
     install_requires=["bluepy==1.3.0"],
